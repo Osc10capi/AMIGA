@@ -217,11 +217,11 @@
         resizeCanvas();
 
         let players = {};
-        let myId = socket.id || 'local_player';
+        let myId = null;
 
         const player = {
             x: 100,
-            y: 100,
+            y: 0,
             vx: 0,
             vy: 0,
             speed: 5.5,
@@ -343,28 +343,19 @@
         function joinGame() {
             if (!selectedRole) return;
             gameStarted = true;
-            myId = socket.id || 'local_player';
+            myId = socket.id;
             document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
 
+            // Posición inicial segura sobre la primera plataforma
             player.x = 100;
-            player.y = height - 260;
+            player.y = height - 240;
             player.vy = 0;
 
-            players[myId] = {
-                id: myId,
-                name: selectedRole === 'karla' ? 'Karla' : 'Oscar',
-                role: selectedRole,
-                skin: selectedSkin,
-                x: player.x,
-                y: player.y,
-                direction: player.direction,
-                isWalking: false,
-                isCrouched: false,
-                chatMessage: "",
-                chatTimer: 0
-            };
-
-            socket.emit('joinGame', { name: players[myId].name, role: selectedRole, skin: selectedSkin });
+            socket.emit('joinGame', { 
+                name: selectedRole === 'karla' ? 'Karla' : 'Oscar', 
+                role: selectedRole, 
+                skin: selectedSkin 
+            });
 
             initAudio();
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
@@ -377,11 +368,21 @@
 
         socket.on('currentPlayers', (serverPlayers) => {
             players = serverPlayers;
-            if (!myId || myId === 'local_player') myId = socket.id;
+            if (!myId) myId = socket.id;
             updateStatusBanner();
         });
-        socket.on('playerMoved', (pData) => { if (players[pData.id]) players[pData.id] = pData; });
-        socket.on('removePlayer', (id) => { delete players[id]; updateStatusBanner(); });
+
+        socket.on('playerMoved', (pData) => { 
+            if (players[pData.id]) {
+                players[pData.id] = pData; 
+            }
+        });
+
+        socket.on('removePlayer', (id) => { 
+            delete players[id]; 
+            updateStatusBanner(); 
+        });
+
         socket.on('playerChat', (data) => {
             if (players[data.id]) {
                 players[data.id].chatMessage = data.message;
@@ -413,7 +414,7 @@
 
             player.chatMessage = msg;
             player.chatTimer = 300;
-            if (players[myId]) {
+            if (myId && players[myId]) {
                 players[myId].chatMessage = msg;
                 players[myId].chatTimer = 300;
             }
@@ -472,13 +473,14 @@
 
             const activeHeight = player.isCrouched ? 40 : player.height;
 
+            // Corrección de colisiones síncronas para evitar caídas al agacharse
             lvl.platforms.forEach(plat => {
                 const platY = height - plat.y;
                 if (
                     player.x + player.width / 2 > plat.x &&
                     player.x - player.width / 2 < plat.x + plat.w &&
                     player.y + activeHeight >= platY &&
-                    player.y + activeHeight - player.vy <= platY + 20 &&
+                    player.y + activeHeight - player.vy <= platY + 18 &&
                     player.vy >= 0
                 ) {
                     player.y = platY - activeHeight;
@@ -489,7 +491,7 @@
 
             if (player.y > height + 100) {
                 player.x = 100;
-                player.y = height - 260;
+                player.y = height - 240;
                 player.vy = 0;
             }
 
@@ -553,7 +555,7 @@
             }
 
             player.x = 100;
-            player.y = height - 260;
+            player.y = height - 240;
             player.vy = 0;
             document.getElementById('hudLevelTitle').innerText = levels[currentLevel].title;
         }
