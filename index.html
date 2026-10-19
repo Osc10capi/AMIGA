@@ -552,18 +552,18 @@
             const lvl = levels[currentLevel];
             player.isGrounded = false;
 
-            const curH = player.isCrouched ? 40 : player.height;
+            const activeHeight = player.isCrouched ? 40 : player.height;
 
             lvl.platforms.forEach(plat => {
                 const platY = height - plat.y;
                 if (
                     player.x + player.width / 2 > plat.x &&
                     player.x - player.width / 2 < plat.x + plat.w &&
-                    player.y + player.height >= platY &&
-                    player.y + player.height - player.vy <= platY + 15 &&
+                    player.y + activeHeight >= platY &&
+                    player.y + activeHeight - player.vy <= platY + 15 &&
                     player.vy >= 0
                 ) {
-                    player.y = platY - player.height;
+                    player.y = platY - activeHeight;
                     player.vy = 0;
                     player.isGrounded = true;
                 }
@@ -606,7 +606,7 @@
             const goalY = height - goal.y - goal.h;
             if (
                 Math.abs(player.x - (goal.x + goal.w / 2)) < 40 &&
-                Math.abs((player.y + player.height / 2) - (goalY + goal.h / 2)) < 60
+                Math.abs((player.y + activeHeight / 2) - (goalY + goal.h / 2)) < 60
             ) {
                 triggerLevelComplete();
             }
@@ -691,8 +691,7 @@
             Object.values(players).forEach(p => {
                 ctx.save();
                 const curH = p.isCrouched ? 40 : 64;
-                const renderY = p.isCrouched ? (p.y + (64 - 40)) : p.y;
-                ctx.translate(p.x, renderY + curH);
+                ctx.translate(p.x, p.y + curH);
 
                 ctx.fillStyle = 'rgba(0,0,0,0.4)';
                 ctx.beginPath(); ctx.ellipse(0, 0, 14, 4, 0, 0, Math.PI * 2); ctx.fill();
