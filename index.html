@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Carrera Estelar Motivacional | Karla & Oscar</title>
+    <title>Aventura 2D | Karla & Oscar</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -11,7 +11,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <!-- Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
 
@@ -22,38 +22,28 @@
             -webkit-user-select: none;
             touch-action: manipulation;
             overflow: hidden;
-            background-color: #030712;
-            color: #f3f4f6;
+            background-color: #0b0f19;
+            color: #f8fafc;
         }
 
-        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .font-game { font-family: 'Fredoka', cursive; }
 
         #gameCanvas {
             display: block;
             width: 100vw;
             height: 100vh;
-            background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
+            background: linear-gradient(to bottom, #0f172a, #1e293b);
         }
 
-        /* Animación única de neón para el inicio */
-        @keyframes cyber-glow {
-            0%, 100% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.4), inset 0 0 15px rgba(56, 189, 248, 0.2); }
-            50% { box-shadow: 0 0 30px rgba(129, 140, 248, 0.8), inset 0 0 25px rgba(129, 140, 248, 0.4); }
+        .glow-box {
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
         }
 
-        .cyber-card {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(3, 7, 18, 0.95) 100%);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            animation: cyber-glow 4s infinite ease-in-out;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
         }
-
-        .glow-button {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glow-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
-        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
     </style>
 </head>
 <body class="relative w-screen h-screen overflow-hidden bg-slate-950 text-slate-100">
@@ -61,110 +51,131 @@
     <!-- CANVAS DEL JUEGO -->
     <canvas id="gameCanvas"></canvas>
 
-    <!-- PANTALLA DE INICIO ÚNICA Y ESTILIZADA -->
-    <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-2xl transition-all duration-700">
-        <canvas id="portalCanvas" class="absolute inset-0 pointer-events-none opacity-40"></canvas>
-
-        <div class="relative z-10 max-w-lg w-full cyber-card rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl">
+    <!-- PANTALLA DE INICIO ÚNICA: SELECCIÓN DE DISPOSITIVO Y PERSONAJE -->
+    <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl transition-all duration-700">
+        <div class="relative z-10 max-w-lg w-full bg-slate-900/90 border border-sky-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl glow-box text-center space-y-6 max-h-[95vh] overflow-y-auto">
             
-            <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-500 to-pink-500 flex items-center justify-center text-white text-3xl shadow-xl animate-bounce">
-                <i class="fa-solid fa-meteor"></i>
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white text-3xl shadow-lg animate-float">
+                <i class="fa-solid fa-gamepad"></i>
             </div>
 
-            <div class="space-y-2">
-                <span class="text-[10px] font-orbitron font-bold tracking-[0.3em] text-sky-400 uppercase">Sincronización Multijugador</span>
-                <h1 class="text-3xl sm:text-4xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-pink-400">
-                    CARRERA ESTELAR
+            <div class="space-y-1">
+                <span class="text-[11px] font-bold tracking-[0.2em] text-sky-400 uppercase font-game">Aventura 2D Interactiva</span>
+                <h1 class="text-3xl sm:text-4xl font-game font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-amber-300">
+                    Karla & Oscar 💕
                 </h1>
-                <p class="text-xs text-slate-300">Selecciona quién eres para iniciar el viaje</p>
+                <p class="text-xs text-slate-300">Selecciona cómo vas a jugar y quién eres</p>
             </div>
 
-            <!-- SELECCIÓN DE PILOTO -->
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="selectPilot('karla')" id="btnKarla" class="p-4 rounded-2xl border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 text-center transition-all flex flex-col items-center gap-2 glow-button">
-                    <i class="fa-solid fa-user-astronaut text-3xl text-sky-400"></i>
-                    <span class="font-orbitron font-bold text-sky-200 text-sm">Karla</span>
-                </button>
-                <button onclick="selectPilot('oscar')" id="btnOscar" class="p-4 rounded-2xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-center transition-all flex flex-col items-center gap-2 glow-button">
-                    <i class="fa-solid fa-robot text-3xl text-indigo-400"></i>
-                    <span class="font-orbitron font-bold text-indigo-200 text-sm">Oscar</span>
-                </button>
+            <!-- 1. SELECCIÓN DE DISPOSITIVO -->
+            <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 text-left space-y-3">
+                <h3 class="text-xs font-bold text-sky-300 uppercase tracking-wider text-center font-game">1. ¿Dónde estás jugando?</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="selectDevice('pc')" id="btnPC" class="p-3 rounded-xl border border-slate-700 bg-slate-900 text-center transition-all flex flex-col items-center gap-1.5 hover:border-sky-400">
+                        <i class="fa-solid fa-laptop text-2xl text-sky-400"></i>
+                        <span class="font-bold text-slate-200 text-xs font-game">Computadora (PC)</span>
+                    </button>
+                    <button onclick="selectDevice('mobile')" id="btnMobile" class="p-3 rounded-xl border border-slate-700 bg-slate-900 text-center transition-all flex flex-col items-center gap-1.5 hover:border-sky-400">
+                        <i class="fa-solid fa-mobile-screen text-2xl text-sky-400"></i>
+                        <span class="font-bold text-slate-200 text-xs font-game">Celular / Tablet</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- CONTROLES -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-left text-xs text-slate-400 space-y-1">
-                <p class="font-semibold text-sky-300 font-orbitron text-[11px]"><i class="fa-solid fa-gamepad mr-1"></i> Comandos de Vuelo:</p>
-                <p>• Saltar obstáculo: <kbd class="bg-slate-800 px-1.5 py-0.5 rounded text-sky-300 font-bold">W</kbd> / <kbd class="bg-slate-800 px-1.5 py-0.5 rounded text-sky-300 font-bold">Espacio</kbd> (o Tocar Pantalla)</p>
+            <!-- 2. SELECCIÓN DE PERSONAJE -->
+            <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 text-left space-y-3">
+                <h3 class="text-xs font-bold text-sky-300 uppercase tracking-wider text-center font-game">2. Elige tu personaje</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="selectRole('karla')" id="btnKarla" class="p-4 rounded-xl border border-sky-500/30 bg-sky-500/10 text-center transition-all flex flex-col items-center gap-1.5">
+                        <i class="fa-solid fa-user-astronaut text-2xl text-sky-400"></i>
+                        <span class="font-bold text-sky-200 text-sm font-game">Karla</span>
+                    </button>
+                    <button onclick="selectRole('oscar')" id="btnOscar" class="p-4 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-center transition-all flex flex-col items-center gap-1.5">
+                        <i class="fa-solid fa-robot text-2xl text-indigo-400"></i>
+                        <span class="font-bold text-indigo-200 text-sm font-game">Oscar</span>
+                    </button>
+                </div>
             </div>
 
-            <button id="btnLaunch" onclick="launchGame()" disabled class="w-full py-4 rounded-2xl font-orbitron font-bold text-slate-950 text-sm tracking-widest uppercase bg-gradient-to-r from-sky-400 via-indigo-400 to-pink-400 opacity-40 cursor-not-allowed shadow-lg glow-button transition-all flex items-center justify-center gap-2">
-                <span>Iniciar Vuelo</span>
-                <i class="fa-solid fa-rocket"></i>
+            <button id="btnStart" onclick="startGame()" disabled class="w-full py-4 rounded-2xl font-game font-bold text-slate-950 text-sm uppercase tracking-wider bg-gradient-to-r from-sky-400 via-indigo-400 to-amber-300 opacity-40 cursor-not-allowed shadow-lg transition-all">
+                Entrar al Mundo 2D ✨
             </button>
         </div>
     </div>
 
-    <!-- UI SUPERIOR EN JUEGO -->
+    <!-- BOTONES TÁCTILES PARA CELULAR (Se activan solo si eliges celular) -->
+    <div id="mobileControls" class="hidden absolute inset-0 pointer-events-none z-30 flex justify-between items-end p-6">
+        <div class="flex gap-3 pointer-events-auto">
+            <button ontouchstart="startMove('left')" ontouchend="stopMove('left')" onmousedown="startMove('left')" onmouseup="stopMove('left')" class="w-16 h-16 rounded-2xl bg-slate-900/80 border border-sky-500/40 text-sky-300 text-2xl flex items-center justify-center shadow-lg active:bg-sky-500/30">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <button ontouchstart="startMove('right')" ontouchend="stopMove('right')" onmousedown="startMove('right')" onmouseup="stopMove('right')" class="w-16 h-16 rounded-2xl bg-slate-900/80 border border-sky-500/40 text-sky-300 text-2xl flex items-center justify-center shadow-lg active:bg-sky-500/30">
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+        <div class="pointer-events-auto">
+            <button ontouchstart="jumpAction()" onclick="jumpAction()" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-500 text-white text-2xl flex items-center justify-center shadow-lg active:scale-95">
+                <i class="fa-solid fa-arrow-up"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- UI SUPERIOR -->
     <div class="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none z-20">
         <div class="bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-sky-500/30 shadow-lg pointer-events-auto flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow">
-                <i class="fa-solid fa-star"></i>
+            <div class="w-8 h-8 rounded-xl bg-sky-500 flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-map"></i>
             </div>
             <div>
-                <h1 class="text-xs sm:text-sm font-orbitron font-bold text-sky-200" id="hudScore">Distancia: 0m</h1>
-                <p class="text-[10px] text-slate-400" id="hudStatus">Conectando...</p>
+                <h1 class="text-xs sm:text-sm font-game font-bold text-sky-200">Mundo Abierto 2D</h1>
+                <p class="text-[10px] text-slate-400" id="hudStatus">En línea</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-2 pointer-events-auto">
-            <button onclick="toggleAudio()" class="bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md p-3 rounded-2xl border border-sky-500/30 text-sky-300 shadow-lg flex items-center justify-center w-11 h-11">
-                <i id="audioIcon" class="fa-solid fa-volume-xmark text-slate-400"></i>
-            </button>
-        </div>
+        <button onclick="toggleAudio()" class="bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md p-3 rounded-2xl border border-sky-500/30 text-sky-300 shadow-lg pointer-events-auto w-11 h-11 flex items-center justify-center">
+            <i id="audioIcon" class="fa-solid fa-volume-xmark text-slate-400"></i>
+        </button>
     </div>
 
     <!-- CHAT EN VIVO -->
     <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-slate-900/90 backdrop-blur-md border border-sky-500/30 rounded-2xl p-2 shadow-2xl pointer-events-auto z-30 flex items-center gap-2">
-        <input type="text" id="chatInput" placeholder="Envía un mensaje estelar..." maxlength="80" onkeydown="handleChatKey(event)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+        <input type="text" id="chatInput" placeholder="Escribe un mensaje..." maxlength="80" onkeydown="handleChatKey(event)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
         <button onclick="sendChatMessage()" class="bg-gradient-to-r from-sky-500 to-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow">
             <i class="fa-solid fa-paper-plane"></i>
         </button>
     </div>
 
-    <!-- MODAL DE MENSAJE MOTIVACIONAL -->
-    <div id="motivationModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-lg z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500">
-        <div class="bg-slate-900 border border-sky-500/40 rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl">
-            <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-amber-400 to-pink-500 flex items-center justify-center text-slate-950 text-2xl font-bold shadow">
-                <i class="fa-solid fa-heart"></i>
-            </div>
-            <h2 id="modalTitle" class="text-xl font-orbitron font-bold text-sky-300">¡Mensaje Estelar!</h2>
-            <p id="modalText" class="text-slate-200 text-sm leading-relaxed font-medium bg-slate-950/60 p-4 rounded-xl border border-slate-800"></p>
-            <button onclick="closeModal()" class="w-full py-3 rounded-xl font-orbitron font-bold text-slate-950 bg-gradient-to-r from-sky-400 via-indigo-300 to-pink-300 shadow-lg">
-                Continuar Vuelo
-            </button>
-        </div>
-    </div>
-
     <script>
         const socket = typeof io !== 'undefined' ? io() : { on: () => {}, emit: () => {} };
-        let selectedPilot = null;
+        let selectedDevice = null;
+        let selectedRole = null;
         let gameStarted = false;
         let myId = null;
 
-        function selectPilot(pilot) {
-            selectedPilot = pilot;
-            document.getElementById('btnKarla').style.borderColor = pilot === 'karla' ? '#38bdf8' : 'rgba(56,189,248,0.2)';
-            document.getElementById('btnOscar').style.borderColor = pilot === 'oscar' ? '#818cf8' : 'rgba(129,140,248,0.2)';
-            
-            const btn = document.getElementById('btnLaunch');
-            btn.disabled = false;
-            btn.classList.remove('opacity-40', 'cursor-not-allowed');
+        function selectDevice(device) {
+            selectedDevice = device;
+            document.getElementById('btnPC').style.borderColor = device === 'pc' ? '#38bdf8' : '#334155';
+            document.getElementById('btnMobile').style.borderColor = device === 'mobile' ? '#38bdf8' : '#334155';
+            checkReady();
+        }
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.getElementById('btnKarla').style.borderColor = role === 'karla' ? '#38bdf8' : 'rgba(56,189,248,0.2)';
+            document.getElementById('btnOscar').style.borderColor = role === 'oscar' ? '#818cf8' : 'rgba(129,140,248,0.2)';
+            checkReady();
+        }
+
+        function checkReady() {
+            if (selectedDevice && selectedRole) {
+                const btn = document.getElementById('btnStart');
+                btn.disabled = false;
+                btn.classList.remove('opacity-40', 'cursor-not-allowed');
+            }
         }
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const portalCanvas = document.getElementById('portalCanvas');
-        const portalCtx = portalCanvas ? portalCanvas.getContext('2d') : null;
 
         let width, height;
         function resize() {
@@ -172,74 +183,57 @@
             height = window.innerHeight;
             canvas.width = width;
             canvas.height = height;
-            if (portalCanvas) { portalCanvas.width = width; portalCanvas.height = height; }
         }
         window.addEventListener('resize', resize);
         resize();
 
-        // Fondo animado de la pantalla de inicio
-        let portalAngle = 0;
-        function drawPortalBackground() {
-            if (!portalCtx || gameStarted) return;
-            portalCtx.clearRect(0, 0, width, height);
-            portalAngle += 0.02;
-
-            portalCtx.save();
-            portalCtx.translate(width / 2, height / 2);
-            for (let i = 0; i < 5; i++) {
-                portalCtx.strokeStyle = i % 2 === 0 ? 'rgba(56, 189, 248, 0.15)' : 'rgba(236, 72, 153, 0.15)';
-                portalCtx.lineWidth = 2;
-                portalCtx.beginPath();
-                portalCtx.arc(0, 0, 80 + i * 50, portalAngle, portalAngle + Math.PI * 1.5);
-                portalCtx.stroke();
-            }
-            portalCtx.restore();
-            requestAnimationFrame(drawPortalBackground);
-        }
-        drawPortalBackground();
-
-        // Variables del juego de carrera estelar
         let players = {};
         const localPlayer = {
-            x: 150,
+            x: 200,
             y: 0,
             vy: 0,
-            gravity: 0.55,
+            gravity: 0.6,
             jumpPower: -12,
+            speed: 5.5,
             isGrounded: false,
+            direction: 1,
             width: 36,
             height: 64,
-            distance: 0,
             chatMessage: "",
             chatTimer: 0
         };
 
-        const groundLevel = 120;
-        let obstacles = [];
-        let obstacleTimer = 0;
-        let score = 0;
+        const worldWidth = 3000;
+        const groundHeight = 130;
+        const camera = { x: 0, smoothness: 0.08 };
 
-        const motivationalQuotes = [
-            "Se te quiere mucho Karla. Recuerda que vales demasiado y que eres única.",
-            "No te dejes tumbar por nada ni por nadie, ¡vales un montón!",
-            "Tienes todo mi apoyo para lo que necesites, siempre estoy contigo.",
-            "Tómate las cosas con calma y acuérdate siempre de lo mucho que vales."
-        ];
+        const keys = { left: false, right: false };
 
+        // Controles de PC por teclado
         window.addEventListener('keydown', (e) => {
-            if (!gameStarted) return;
+            if (!gameStarted || selectedDevice !== 'pc') return;
             if (document.activeElement.id === 'chatInput') return;
-            if (e.key === ' ' || e.key.toLowerCase() === 'w' || e.key === 'ArrowUp') {
-                jumpAction();
-            }
+
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = true;
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = true;
+            if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w' || e.key === ' ') jumpAction();
         });
 
-        window.addEventListener('click', () => {
-            if (gameStarted && document.activeElement.id !== 'chatInput') {
-                jumpAction();
-            }
+        window.addEventListener('keyup', (e) => {
+            if (!gameStarted || selectedDevice !== 'pc') return;
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = false;
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = false;
         });
 
+        // Controles Táctiles para celular
+        function startMove(dir) {
+            if (dir === 'left') keys.left = true;
+            if (dir === 'right') keys.right = true;
+        }
+        function stopMove(dir) {
+            if (dir === 'left') keys.left = false;
+            if (dir === 'right') keys.right = false;
+        }
         function jumpAction() {
             if (localPlayer.isGrounded) {
                 localPlayer.vy = localPlayer.jumpPower;
@@ -247,15 +241,21 @@
             }
         }
 
-        function launchGame() {
-            if (!selectedPilot) return;
+        function startGame() {
+            if (!selectedDevice || !selectedRole) return;
             gameStarted = true;
             myId = socket.id;
+
             document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
 
+            // Si seleccionó celular, mostramos los botones táctiles en pantalla
+            if (selectedDevice === 'mobile') {
+                document.getElementById('mobileControls').classList.remove('hidden');
+            }
+
             socket.emit('joinGame', {
-                name: selectedPilot === 'karla' ? 'Karla' : 'Oscar',
-                role: selectedPilot
+                name: selectedRole === 'karla' ? 'Karla' : 'Oscar',
+                role: selectedRole
             });
 
             initAudio();
@@ -269,7 +269,6 @@
         socket.on('currentPlayers', (serverPlayers) => {
             players = serverPlayers;
             if (!myId) myId = socket.id;
-            updateStatus();
         });
 
         socket.on('playerMoved', (pData) => {
@@ -278,7 +277,6 @@
 
         socket.on('removePlayer', (id) => {
             delete players[id];
-            updateStatus();
         });
 
         socket.on('playerChat', (data) => {
@@ -287,18 +285,6 @@
                 players[data.id].chatTimer = 300;
             }
         });
-
-        function updateStatus() {
-            const count = Object.keys(players).length;
-            const statusEl = document.getElementById('hudStatus');
-            if (count >= 2) {
-                statusEl.innerText = "Modo Dúo Activo ✨";
-                statusEl.className = "text-[10px] text-emerald-400 font-bold";
-            } else {
-                statusEl.innerText = "Modo Solo (Esperando compañero)";
-                statusEl.className = "text-[10px] text-amber-400";
-            }
-        }
 
         function sendChatMessage() {
             const input = document.getElementById('chatInput');
@@ -312,21 +298,26 @@
         }
         function handleChatKey(e) { if (e.key === 'Enter') sendChatMessage(); }
 
-        // Estrellas de fondo dinámicas
-        const stars = Array.from({ length: 40 }, () => ({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            size: Math.random() * 2.5 + 1,
-            speed: Math.random() * 2 + 1
-        }));
+        const sceneryElements = [
+            { type: 'tree', x: 400 },
+            { type: 'rock', x: 900 },
+            { type: 'tree', x: 1400 },
+            { type: 'rock', x: 2000 },
+            { type: 'tree', x: 2500 }
+        ];
 
         function updateGame() {
             if (!gameStarted) return;
 
+            let vx = 0;
+            if (keys.left) { vx = -localPlayer.speed; localPlayer.direction = -1; }
+            if (keys.right) { vx = localPlayer.speed; localPlayer.direction = 1; }
+
+            localPlayer.x += vx;
             localPlayer.vy += localPlayer.gravity;
             localPlayer.y += localPlayer.vy;
 
-            const floorY = height - groundLevel;
+            const floorY = height - groundHeight;
             localPlayer.isGrounded = false;
 
             if (localPlayer.y >= floorY - localPlayer.height) {
@@ -335,129 +326,97 @@
                 localPlayer.isGrounded = true;
             }
 
-            score += 0.1;
-            document.getElementById('hudScore').innerText = `Distancia: ${Math.floor(score)}m`;
-
-            // Generar obstáculos estelares
-            obstacleTimer++;
-            if (obstacleTimer > 110) {
-                obstacleTimer = 0;
-                obstacles.push({
-                    x: width + 50,
-                    y: floorY - 45,
-                    w: 35,
-                    h: 45
-                });
-            }
-
-            // Mover y verificar colisiones con obstáculos
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                obstacles[i].x -= 6;
-
-                // Colisión segura con rectángulo
-                if (
-                    localPlayer.x < obstacles[i].x + obstacles[i].w &&
-                    localPlayer.x + localPlayer.width > obstacles[i].x &&
-                    localPlayer.y < obstacles[i].y + obstacles[i].h &&
-                    localPlayer.y + localPlayer.height > obstacles[i].y
-                ) {
-                    // Si choca, muestra un mensaje motivacional aleatorio y lo salta
-                    triggerMotivationModal();
-                    obstacles.splice(i, 1);
-                    continue;
-                }
-
-                if (obstacles[i].x < -50) obstacles.splice(i, 1);
-            }
+            if (localPlayer.x < 50) localPlayer.x = 50;
+            if (localPlayer.x > worldWidth - 50) localPlayer.x = worldWidth - 50;
 
             if (localPlayer.chatTimer > 0) localPlayer.chatTimer--;
 
             if (myId && players[myId]) {
                 players[myId].x = localPlayer.x;
                 players[myId].y = localPlayer.y;
+                players[myId].direction = localPlayer.direction;
                 players[myId].chatMessage = localPlayer.chatMessage;
                 players[myId].chatTimer = localPlayer.chatTimer;
 
                 socket.emit('playerMovement', {
                     x: localPlayer.x,
                     y: localPlayer.y,
-                    chatMessage: localPlayer.chatMessage
+                    direction: localPlayer.direction
                 });
             }
-        }
 
-        function triggerMotivationModal() {
-            const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
-            document.getElementById('modalText').innerText = randomQuote;
-            document.getElementById('motivationModal').classList.remove('opacity-0', 'pointer-events-none');
-            document.getElementById('motivationModal').classList.add('opacity-100');
-        }
-
-        function closeModal() {
-            document.getElementById('motivationModal').classList.remove('opacity-100');
-            document.getElementById('motivationModal').classList.add('opacity-0', 'pointer-events-none');
+            camera.x += ((localPlayer.x - width / 2) - camera.x) * camera.smoothness;
+            if (camera.x < 0) camera.x = 0;
+            if (camera.x > worldWidth - width) camera.x = worldWidth - width;
         }
 
         function renderGame() {
             ctx.clearRect(0, 0, width, height);
 
-            // Fondo estelar en movimiento
-            ctx.fillStyle = '#ffffff';
-            stars.forEach(s => {
-                s.x -= s.speed;
-                if (s.x < 0) s.x = width;
-                ctx.globalAlpha = Math.random() * 0.5 + 0.3;
-                ctx.fillRect(s.x, s.y, s.size, s.size);
+            ctx.save();
+            ctx.translate(-camera.x, 0);
+
+            const floorY = height - groundHeight;
+
+            // Elementos de decoración del paisaje de fondo
+            sceneryElements.forEach(el => {
+                ctx.fillStyle = '#1e293b';
+                if (el.type === 'tree') {
+                    ctx.fillRect(el.x + 15, floorY - 90, 20, 90);
+                    ctx.fillStyle = '#059669';
+                    ctx.beginPath(); ctx.arc(el.x + 25, floorY - 90, 40, 0, Math.PI * 2); ctx.fill();
+                } else {
+                    ctx.beginPath();
+                    ctx.roundRect(el.x, floorY - 35, 60, 35, [15, 15, 0, 0]);
+                    ctx.fillStyle = '#475569';
+                    ctx.fill();
+                }
             });
-            ctx.globalAlpha = 1.0;
 
-            const floorY = height - groundLevel;
-
-            // Suelo futurista
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(0, floorY, width, groundLevel);
+            // Suelo sólido 2D
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, floorY, worldWidth, groundHeight);
             ctx.fillStyle = '#38bdf8';
-            ctx.fillRect(0, floorY, width, 4);
-
-            // Obstáculos
-            obstacles.forEach(obs => {
-                ctx.fillStyle = '#f43f5e';
-                ctx.beginPath();
-                ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 8);
-                ctx.fill();
-                ctx.strokeStyle = '#fda4af';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            });
+            ctx.fillRect(0, floorY, worldWidth, 5);
 
             // Dibujar jugadores
             Object.values(players).forEach(p => {
                 ctx.save();
                 ctx.translate(p.x, floorY - localPlayer.height + (p.y || 0));
 
-                // Sombra
                 ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                ctx.beginPath(); ctx.ellipse(localPlayer.width / 2, localPlayer.height + 4, 14, 4, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(localPlayer.width / 2, localPlayer.height + 4, 16, 5, 0, 0, Math.PI * 2); ctx.fill();
 
-                // Cuerpo del personaje
-                ctx.fillStyle = p.role === 'karlet' || p.role === 'karla' ? '#0284c7' : '#6366f1';
+                if (p.direction === -1) {
+                    ctx.translate(localPlayer.width, 0);
+                    ctx.scale(-1, 1);
+                }
+
+                // Cuerpo del avatar
+                ctx.fillStyle = p.role === 'karla' ? '#0284c7' : '#4f46e5';
                 ctx.beginPath();
-                ctx.roundRect(0, 16, localPlayer.width, 48, 8);
+                ctx.roundRect(0, 18, localPlayer.width, 46, 8);
                 ctx.fill();
 
                 // Cabeza
                 ctx.fillStyle = '#fed7aa';
                 ctx.beginPath();
-                ctx.arc(localPlayer.width / 2, 12, 12, 0, Math.PI * 2);
+                ctx.arc(localPlayer.width / 2, 12, 13, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Cabello o sombrero
+                ctx.fillStyle = p.role === 'karla' ? '#7c2d12' : '#1e1b4b';
+                ctx.beginPath();
+                ctx.arc(localPlayer.width / 2, 8, 14, Math.PI, Math.PI * 2);
                 ctx.fill();
 
                 ctx.restore();
 
-                // Nombre y Chat
+                // Nombre y Chat flotante
                 ctx.save();
                 ctx.translate(p.x, floorY - localPlayer.height + (p.y || 0));
-                ctx.fillStyle = '#e2e8f0';
-                ctx.font = 'bold 11px Orbitron, sans-serif';
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(p.name, localPlayer.width / 2, -10);
 
@@ -481,6 +440,8 @@
                 }
                 ctx.restore();
             });
+
+            ctx.restore();
         }
 
         function gameLoop() {
@@ -491,19 +452,19 @@
 
         let audioCtx, isAudioPlaying = false, melodyInterval;
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        const notes = [261.63, 329.63, 392.00, 523.25];
+        const notes = [261.63, 293.66, 329.63, 392.00];
         function playNote(freq) {
             if (!audioCtx || !isAudioPlaying) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.0);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 1.0);
+            osc.start(); osc.stop(audioCtx.currentTime + 1.2);
         }
         function startMelody() {
             let idx = 0;
-            melodyInterval = setInterval(() => { if (isAudioPlaying) { playNote(notes[idx]); idx = (idx+1)%notes.length; } }, 700);
+            melodyInterval = setInterval(() => { if (isAudioPlaying) { playNote(notes[idx]); idx = (idx+1)%notes.length; } }, 800);
         }
         function toggleAudio() {
             initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
