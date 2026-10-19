@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+}<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -552,22 +552,29 @@
             const lvl = levels[currentLevel];
             player.isGrounded = false;
 
-            const activeHeight = player.isCrouched ? 40 : player.height;
+            // CORRECCIÓN DE COLISIÓN AL AGACHARSE (Fijar la base del personaje al suelo de la plataforma)
+            const curH = player.isCrouched ? 40 : player.height;
+            const diffH = player.height - curH;
 
             lvl.platforms.forEach(plat => {
                 const platY = height - plat.y;
                 if (
                     player.x + player.width / 2 > plat.x &&
                     player.x - player.width / 2 < plat.x + plat.w &&
-                    player.y + activeHeight >= platY &&
-                    player.y + activeHeight - player.vy <= platY + 15 &&
+                    player.y + player.height >= platY &&
+                    player.y + player.height - player.vy <= platY + 15 &&
                     player.vy >= 0
                 ) {
-                    player.y = platY - activeHeight;
+                    player.y = platY - player.height;
                     player.vy = 0;
                     player.isGrounded = true;
                 }
             });
+
+            // Si está agachado y en el suelo, ajustamos su posición vertical para que no flote ni caiga
+            if (player.isCrouched && player.isGrounded) {
+                // Mantenemos la base fija
+            }
 
             if (player.y > height + 100) {
                 player.x = 100;
@@ -606,7 +613,7 @@
             const goalY = height - goal.y - goal.h;
             if (
                 Math.abs(player.x - (goal.x + goal.w / 2)) < 40 &&
-                Math.abs((player.y + activeHeight / 2) - (goalY + goal.h / 2)) < 60
+                Math.abs((player.y + player.height / 2) - (goalY + goal.h / 2)) < 60
             ) {
                 triggerLevelComplete();
             }
@@ -691,7 +698,9 @@
             Object.values(players).forEach(p => {
                 ctx.save();
                 const curH = p.isCrouched ? 40 : 64;
-                ctx.translate(p.x, p.y + curH);
+                // Posicionamos correctamente según si está agachado para que la base no cambie de altura
+                const renderY = p.isCrouched ? (p.y + (64 - 40)) : p.y;
+                ctx.translate(p.x, renderY + curH);
 
                 ctx.fillStyle = 'rgba(0,0,0,0.4)';
                 ctx.beginPath(); ctx.ellipse(0, 0, 14, 4, 0, 0, Math.PI * 2); ctx.fill();
@@ -701,6 +710,7 @@
                 const skin = p.skin || 'skin1';
 
                 if (skin === 'skin2') {
+                    // Estilo / Skin 2 (Alternativo - Tonos Neón / Morado-Rosa)
                     ctx.fillStyle = '#ec4899';
                     ctx.beginPath();
                     ctx.roundRect(-12, -curH + 18, 24, curH - 20, 6);
@@ -716,6 +726,7 @@
                     ctx.arc(0, -curH + 9, 13, Math.PI, Math.PI * 2);
                     ctx.fill();
                 } else {
+                    // Estilo / Skin 1 (Clásico - Azul / Índigo)
                     ctx.fillStyle = p.role === 'karla' ? '#0284c7' : '#4f46e5';
                     ctx.beginPath();
                     ctx.roundRect(-12, -curH + 18, 24, curH - 20, 6);
