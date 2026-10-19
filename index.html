@@ -60,7 +60,7 @@
     <!-- CANVAS DEL JUEGO -->
     <canvas id="gameCanvas"></canvas>
 
-    <!-- PANTALLA DE INICIO ÚNICA Y EXCLUSIVA (SIN PLAGIO) -->
+    <!-- PANTALLA DE INICIO -->
     <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-2xl transition-all duration-700">
         <canvas id="uniquePortalCanvas" class="absolute inset-0 pointer-events-none opacity-30"></canvas>
 
@@ -128,10 +128,10 @@
             <button onclick="interactLetter()" class="w-16 h-16 rounded-2xl bg-amber-500 text-slate-950 text-xl flex items-center justify-center shadow-lg active:scale-95" title="Interactuar / Carta">
                 <i class="fa-solid fa-envelope-open-text"></i>
             </button>
-            <button ontouchstart="pressKey('crouch')" ontouchend="releaseKey('crouch')" onmousedown="pressKey('crouch')" onmouseup="releaseKey('crouch')" class="w-16 h-16 rounded-2xl bg-indigo-600 text-white text-xl flex items-center justify-center shadow-lg active:scale-95">
+            <button ontouchstart="pressKey('crouch')" ontouchend="releaseKey('crouch')" onmousedown="pressKey('crouch')" onmouseup="releaseKey('crouch')" class="w-16 h-16 rounded-2xl bg-indigo-600 text-white text-xl flex items-center justify-center shadow-lg active:scale-95" title="Agacharse">
                 <i class="fa-solid fa-arrow-down"></i>
             </button>
-            <button ontouchstart="pressKey('jump')" onmousedown="pressKey('jump')" class="w-16 h-16 rounded-2xl bg-sky-500 text-white text-xl flex items-center justify-center shadow-lg active:scale-95">
+            <button ontouchstart="pressKey('jump')" onmousedown="pressKey('jump')" class="w-16 h-16 rounded-2xl bg-sky-500 text-white text-xl flex items-center justify-center shadow-lg active:scale-95" title="Saltar">
                 <i class="fa-solid fa-arrow-up"></i>
             </button>
         </div>
@@ -145,7 +145,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CARTA CON FOTO RANDOM REAL -->
+    <!-- MODAL DE CARTA CON FOTO Y MENSAJES ESPECÍFICOS -->
     <div id="letterModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-lg z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
         <div class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-amber-500/40 rounded-3xl max-w-md w-full p-6 shadow-2xl relative text-center space-y-4 max-h-[90vh] overflow-y-auto">
             <button onclick="closeLetterModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -156,7 +156,7 @@
             
             <h2 id="modalTitle" class="text-xl font-orbitron font-bold text-amber-200">Carta Especial</h2>
             
-            <!-- FOTO RANDOM INTEGRADA EN LA CARTA -->
+            <!-- FOTO RANDOM -->
             <div class="rounded-xl overflow-hidden bg-slate-950 border border-amber-500/30 max-h-[220px] flex items-center justify-center p-2">
                 <img id="modalPhoto" src="" alt="Recuerdo" class="max-h-[200px] w-auto object-contain rounded-lg">
             </div>
@@ -291,7 +291,6 @@
             chatTimer: 0
         };
 
-        // ÚNICO NIVEL LARGO CON PLATAFORMAS DE PARKOUR
         const longLevel = {
             worldWidth: 3500,
             platforms: [
@@ -312,11 +311,32 @@
         const camera = { x: 0, smoothness: 0.08 };
         const keys = { left: false, right: false };
 
-        // 3 CARTAS CON LAS FOTOS EXACTAS QUE ENVIASTE
+        // 3 CARTAS CON FOTOS Y MENSAJES EXACTOS
         const letters = [
-            { id: 1, x: 950, title: "Carta 1: Primer Recuerdo", message: "Foto random que encontré. Se te quiere mucho Karla, recuerda que vales demasiado y que eres única.", photo: "WhatsApp Image 2026-10-18 at 10.50.09 PM.jpeg", opened: false },
-            { id: 2, x: 2100, title: "Carta 2: Segundo Recuerdo", message: "Foto random que encontré. No te dejes tumbar por nada ni por nadie. ¡Tienes todo mi apoyo!", photo: "WhatsApp Image 2026-10-18 at 10.50.09 PM (1)_2.jpeg", opened: false },
-            { id: 3, x: 3200, title: "Carta 3: Meta Final", message: "Foto random que encontré. Tómate las cosas con calma y acuérdate siempre de lo mucho que vales. ¡Juego completado!", photo: "WhatsApp Image 2026-10-18 at 11.08.12 PM_2.jpeg", opened: false }
+            { 
+                id: 1, 
+                x: 950, 
+                title: "Carta 1: Primer Recuerdo", 
+                message: "Foto random que encontré. Se te quiere mucho Karla. Recuerda que vales demasiado y que eres única en este mundo. Nunca lo olvides.", 
+                photo: "WhatsApp Image 2026-10-18 at 10.50.09 PM.jpeg", 
+                opened: false 
+            },
+            { 
+                id: 2, 
+                x: 2100, 
+                title: "Carta 2: Segundo Recuerdo", 
+                message: "Foto random que encontré. No te dejes tumbar por nada ni por nadie. Tienes todo mi apoyo para lo que necesites, siempre estoy contigo.", 
+                photo: "WhatsApp Image 2026-10-18 at 10.50.09 PM (1)_2.jpeg", 
+                opened: false 
+            },
+            { 
+                id: 3, 
+                x: 3200, 
+                title: "Carta 3: Meta Final", 
+                message: "Foto random que encontré. Sé que a veces hay días difíciles, pero tómate las cosas con calma y acuérdate siempre de lo mucho que vales y de lo lejos que vas a llegar.", 
+                photo: "WhatsApp Image 2026-10-18 at 11.08.12 PM_2.jpeg", 
+                opened: false 
+            }
         ];
 
         let activeLetterNear = null;
@@ -431,7 +451,7 @@
 
             const activeHeight = localPlayer.isCrouched ? 40 : localPlayer.height;
 
-            // Colisiones con suelo y plataformas
+            // Colisiones con el suelo principal
             if (
                 localPlayer.x + localPlayer.width / 2 > 0 &&
                 localPlayer.x - localPlayer.width / 2 < longLevel.worldWidth &&
@@ -444,6 +464,7 @@
                 localPlayer.isGrounded = true;
             }
 
+            // Colisiones con las plataformas
             longLevel.platforms.forEach(plat => {
                 const platY = height - plat.y;
                 if (
@@ -538,7 +559,7 @@
 
             const floorY = height - groundHeight;
 
-            // Renderizar Plataformas de Parkour
+            // Renderizar Plataformas
             longLevel.platforms.forEach(plat => {
                 const platY = height - plat.y;
                 ctx.fillStyle = 'rgba(0,0,0,0.4)';
@@ -555,9 +576,8 @@
             ctx.fillStyle = '#38bdf8';
             ctx.fillRect(0, floorY, longLevel.worldWidth, 5);
 
-            // Renderizar las 3 Cartas
+            // Renderizar Cartas
             letters.forEach(letObj => {
-                // Buscamos la plataforma o suelo donde se ubica para colocar la carta correctamente
                 let lY = floorY - 35;
                 longLevel.platforms.forEach(plat => {
                     if (letObj.x >= plat.x && letObj.x <= plat.x + plat.w) {
@@ -583,10 +603,10 @@
                 ctx.fillText(letObj.opened ? 'Abierta' : '¡Carta!', letObj.x, lY - 10);
             });
 
-            // Renderizar Jugadores con corrección de altura al agacharse
+            // Renderizar Jugadores con posición vertical fija al agacharse
             Object.values(players).forEach(p => {
                 ctx.save();
-                const curH = p.isCrouched ? 40 : 64;
+                const curH = p.isCrouched ? 40 : localPlayer.height;
                 ctx.translate(p.x, p.y + curH);
 
                 ctx.fillStyle = 'rgba(0,0,0,0.4)';
