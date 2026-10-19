@@ -264,36 +264,47 @@
             chatTimer: 0
         };
 
-        // PLATAFORMAS CON LOS PISOS MÁS ALTOS DISPONIBLES PARA LAS CARTAS
+        // PLATAFORMAS CON LOS TERCEROS PISOS (ALTOS)
         const longLevel = {
             worldWidth: 3800,
             platforms: [
                 { x: 0, y: 120, w: 350, h: 120 },
-                { x: 420, y: 320, w: 110, h: 30 }, // Piso alto
-                { x: 420, y: 160, w: 110, h: 30 },
-                { x: 600, y: 460, w: 120, h: 30 }, // Piso más alto
-                { x: 600, y: 240, w: 120, h: 30 },
-                // CARTA 1 UBICADA EN EL PISO MÁS ALTO (y: 460)
+                { x: 420, y: 150, w: 110, h: 30 }, // Piso 1
+                { x: 420, y: 280, w: 110, h: 30 }, // Piso 2
+                { x: 420, y: 410, w: 110, h: 30 }, // Piso 3
+                { x: 600, y: 180, w: 120, h: 30 },
+                { x: 600, y: 320, w: 120, h: 30 },
+                { x: 600, y: 460, w: 120, h: 30 }, // Piso 3
+                // CARTA 1 EXACTAMENTE EN EL 3ER PISO (y: 460)
                 { x: 820, y: 460, w: 140, h: 30 },
-                { x: 820, y: 220, w: 140, h: 30 },
-                { x: 1040, y: 380, w: 110, h: 30 },
+                { x: 820, y: 300, w: 140, h: 30 },
+                { x: 820, y: 160, w: 140, h: 30 },
                 { x: 1040, y: 200, w: 110, h: 30 },
-                { x: 1250, y: 480, w: 120, h: 30 },
-                { x: 1250, y: 300, w: 120, h: 30 },
-                { x: 1480, y: 420, w: 120, h: 30 },
-                { x: 1480, y: 220, w: 120, h: 30 },
-                // CARTA 2 UBICADA EN EL PISO MÁS ALTO (y: 480)
-                { x: 1720, y: 480, w: 140, h: 30 },
-                { x: 1720, y: 240, w: 140, h: 30 },
-                { x: 1950, y: 380, w: 110, h: 30 },
-                { x: 1950, y: 200, w: 110, h: 30 },
-                { x: 2170, y: 460, w: 120, h: 30 },
-                { x: 2170, y: 260, w: 120, h: 30 },
-                { x: 2400, y: 400, w: 120, h: 30 },
-                { x: 2400, y: 220, w: 120, h: 30 },
-                // CARTA 3 UBICADA EN EL PISO MÁS ALTO (y: 460)
+                { x: 1040, y: 350, w: 110, h: 30 },
+                { x: 1040, y: 480, w: 110, h: 30 }, // Piso 3
+                { x: 1250, y: 180, w: 120, h: 30 },
+                { x: 1250, y: 320, w: 120, h: 30 },
+                { x: 1250, y: 460, w: 120, h: 30 }, // Piso 3
+                { x: 1480, y: 200, w: 120, h: 30 },
+                { x: 1480, y: 340, w: 120, h: 30 },
+                { x: 1480, y: 490, w: 120, h: 30 }, // Piso 3
+                // CARTA 2 EXACTAMENTE EN EL 3ER PISO (y: 490)
+                { x: 1720, y: 490, w: 140, h: 30 },
+                { x: 1720, y: 320, w: 140, h: 30 },
+                { x: 1720, y: 180, w: 140, h: 30 },
+                { x: 1950, y: 190, w: 110, h: 30 },
+                { x: 1950, y: 330, w: 110, h: 30 },
+                { x: 1950, y: 470, w: 110, h: 30 }, // Piso 3
+                { x: 2170, y: 200, w: 120, h: 30 },
+                { x: 2170, y: 340, w: 120, h: 30 },
+                { x: 2170, y: 480, w: 120, h: 30 }, // Piso 3
+                { x: 2400, y: 180, w: 120, h: 30 },
+                { x: 2400, y: 320, w: 120, h: 30 },
+                { x: 2400, y: 460, w: 120, h: 30 }, // Piso 3
+                // CARTA 3 EXACTAMENTE EN EL 3ER PISO (y: 460)
                 { x: 2640, y: 460, w: 140, h: 30 },
-                { x: 2640, y: 220, w: 140, h: 30 },
+                { x: 2640, y: 300, w: 140, h: 30 },
+                { x: 2640, y: 160, w: 140, h: 30 },
                 { x: 2880, y: 130, w: 900, h: 120 }
             ]
         };
@@ -302,7 +313,7 @@
         const camera = { x: 0, smoothness: 0.08 };
         const keys = { left: false, right: false };
 
-        // 3 CARTAS COLOCADAS EXACTAMENTE EN LOS PISOS MÁS ALTOS
+        // 3 CARTAS COLOCADAS EN LAS COORDENADAS EXACTAS DE LOS TERCEROS PISOS
         const letters = [
             { 
                 id: 1, 
