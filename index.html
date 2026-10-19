@@ -3,64 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prueba de Enlace - AMIGA</title>
+    <title>Prueba de Dos Jugadores - AMIGA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="/socket.io/socket.io.js"></script>
     <style>
-        body {
-            background-color: #0d1117;
-            color: #f0f6fc;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: #161b22;
-            padding: 30px;
-            border-radius: 12px;
-            border: 1px solid #30363d;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-        h1 { color: #58a6ff; }
-        #status {
-            font-weight: bold;
-            padding: 8px 16px;
-            border-radius: 6px;
-            display: inline-block;
-            margin-top: 10px;
-        }
-        .disconnected { background: #da3633; color: white; }
-        .connected { background: #238636; color: white; }
+        body { background-color: #0d1117; color: #f0f6fc; font-family: sans-serif; overflow: hidden; margin: 0; }
+        canvas { display: block; width: 100vw; height: 100vh; background: #0d1117; }
     </style>
 </head>
-<body>
+<body class="relative w-screen h-screen">
 
-    <div class="card">
-        <h1>Prueba de Conexión en Línea</h1>
-        <p>Estado del servidor con Socket.io:</p>
-        <div id="status" class="disconnected">Conectando al servidor...</div>
+    <div class="absolute top-4 left-4 bg-slate-900/90 border border-sky-500/30 p-4 rounded-xl shadow-xl z-10 space-y-2">
+        <h1 class="text-sm font-bold text-sky-400">Prueba Multijugador (2 Cubos)</h1>
+        <p class="text-xs text-slate-300">Usa las teclas <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">A</kbd> y <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">D</kbd> o las flechas <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">←</kbd> <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">→</kbd> para mover tu cubo.</p>
+        <p id="playerCount" class="text-xs font-bold text-amber-400">Jugadores conectados: 0</p>
     </div>
 
+    <canvas id="gameCanvas"></canvas>
+
     <script>
-        const statusEl = document.getElementById('status');
-        
-        // Intentar conectar con el servidor mediante Socket.io
         const socket = io();
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let myId = null;
+        let players = {};
+
+        // Mi cubo local
+        const myPlayer = {
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 2,
+            size: 40,
+            speed: 5,
+            color: '#' + Math.floor(Math.random()*16777215).toString(16) // Color aleatorio para distinguirte
+        };
+
+        const keys = { left: false, right: false, up: false, down: false };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = true;
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = true;
+            if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') keys.up = true;
+            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') keys.down = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = false;
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = false;
+            if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') keys.up = false;
+            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') keys.down = false;
+        });
+
+        // Conectarse y registrarse en el servidor
         socket.on('connect', () => {
-            statusEl.innerText = "¡Conectado exitosamente al servidor! 🎉 (ID: " + socket.id + ")";
-            statusEl.className = "connected";
+            myId = socket.id;
+            socket.emit('joinGame', { name: 'Jugador (' + myId.substr(0,4) + ')', role: 'test', skin: 'skin1' });
         });
 
-        socket.on('disconnect', () => {
-            statusEl.innerText = "Desconectado del servidor ❌";
-            statusEl.className = "disconnected";
+        socket.on('currentPlayers', (serverPlayers) => {
+            players = serverPlayers;
+            document.getElementById('playerCount').innerText = "Jugadores conectados: " + Object.keys(players).length;
         });
+
+        socket.on('playerMoved', (pData) => {
+            if (players[pData.id]) {
+                players[pData.id].x = pData.x;
+                players[pData.id].y = pData.y;
+            }
+        });
+
+        socket.on('removePlayer', (id) => {
+            delete players[id];
+            document.getElementById('playerCount').innerText = "Jugadores conectados: " + Object.keys(players).length;
+        });
+
+        function update() {
+            if (keys.left) myPlayer.x -= myPlayer.speed;
+            if (keys.right) myPlayer.x += myPlayer.speed;
+            if (keys.up) myPlayer.y -= myPlayer.speed;
+            if (keys.down) myPlayer.y += myPlayer.speed;
+
+            // Enviar posición al servidor
+            if (myId && players[myId]) {
+                players[myId].x = myPlayer.x;
+                players[myId].y = myPlayer.y;
+                socket.emit('playerMovement', { x: myPlayer.x, y: myPlayer.y, direction: 1, isWalking: true, isCrouched: false });
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar todos los cubos conectados
+            Object.values(players).forEach(p => {
+                ctx.save();
+                ctx.fillStyle = (p.id === myId) ? '#38bdf8' : '#ec4899'; // Tu cubo es celeste, el otro es rosa
+                ctx.fillRect(p.x, p.y, 40, 40);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(p.id === myId ? 'Tú' : 'Compañero', p.x + 20, p.y - 10);
+                ctx.restore();
+            });
+        }
+
+        function loop() {
+            update();
+            render();
+            requestAnimationFrame(loop);
+        }
+        loop();
     </script>
-
 </body>
 </html>
