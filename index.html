@@ -221,9 +221,9 @@
 
         const player = {
             x: 100,
-            y: 50,
+            y: -200, // Empiezan cayendo desde arriba
             vx: 0,
-            vy: 0,
+            vy: 2,
             speed: 5.5,
             jumpPower: -13,
             gravity: 0.6,
@@ -231,13 +231,14 @@
             isCrouched: false,
             direction: 1,
             isWalking: false,
+            animFrame: 0,
+            animTimer: 0,
             width: 32,
             height: 64,
             chatMessage: "",
             chatTimer: 0
         };
 
-        // Definición de niveles con plataformas 100% sólidas calculadas desde la base de la pantalla (floorY)
         const levels = {
             1: {
                 title: "Nivel 1: El Comienzo",
@@ -348,8 +349,8 @@
             document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
 
             player.x = 100;
-            player.y = 50;
-            player.vy = 0;
+            player.y = -200; // Empiezan cayendo desde arriba en cada partida
+            player.vy = 2;
 
             socket.emit('joinGame', { 
                 name: selectedRole === 'karla' ? 'Karla' : 'Oscar', 
@@ -472,14 +473,14 @@
             player.isGrounded = false;
             const activeHeight = player.isCrouched ? 40 : player.height;
 
-            // Física de colisión sólida de arriba hacia abajo
+            // Física de colisión 100% sólida basada en la estructura limpia de referencia
             lvl.platforms.forEach(plat => {
                 const platTopY = height - plat.y - plat.h;
                 if (
                     player.x + player.width / 2 > plat.x &&
                     player.x - player.width / 2 < plat.x + plat.w &&
                     player.y + activeHeight >= platTopY &&
-                    player.y + activeHeight - player.vy <= platTopY + 20 &&
+                    player.y + activeHeight - player.vy <= platTopY + 22 &&
                     player.vy >= 0
                 ) {
                     player.y = platTopY - activeHeight;
@@ -488,15 +489,20 @@
                 }
             });
 
-            // Si cae al vacío, reaparece arriba a salvo
-            if (player.y > height + 100) {
+            // Si cae al vacío, reaparece cayendo desde arriba
+            if (player.y > height + 150) {
                 player.x = 100;
-                player.y = 50;
-                player.vy = 0;
+                player.y = -150;
+                player.vy = 2;
             }
 
             if (player.x < 50) player.x = 50;
             if (player.x > lvl.worldWidth - 50) player.x = lvl.worldWidth - 50;
+
+            if (player.isWalking) {
+                player.animTimer++;
+                if (player.animTimer % 8 === 0) player.animFrame = (player.animFrame + 1) % 4;
+            } else { player.animFrame = 0; }
 
             if (player.chatTimer > 0) player.chatTimer--;
 
@@ -555,8 +561,8 @@
             }
 
             player.x = 100;
-            player.y = 50;
-            player.vy = 0;
+            player.y = -150;
+            player.vy = 2;
             document.getElementById('hudLevelTitle').innerText = levels[currentLevel].title;
         }
 
@@ -574,7 +580,7 @@
             ctx.save();
             ctx.translate(-camera.x, 0);
 
-            // Renderizar plataformas
+            // Renderizado de plataformas sólidas
             lvl.platforms.forEach(plat => {
                 const platTopY = height - plat.y - plat.h;
                 ctx.fillStyle = 'rgba(0,0,0,0.4)';
@@ -587,7 +593,7 @@
                 ctx.fillRect(plat.x, platTopY, plat.w, 4);
             });
 
-            // Renderizar meta
+            // Renderizado de la meta
             const goal = lvl.goal;
             const goalTopY = height - goal.y - goal.h;
             
@@ -610,7 +616,7 @@
             ctx.textAlign = 'center';
             ctx.fillText('META', goal.x + goal.w / 2, goalTopY + goal.h / 2 + 7);
 
-            // Renderizar jugadores
+            // Renderizado alineado de los avatares (basado en el archivo limpio de referencia)
             Object.values(players).forEach(p => {
                 ctx.save();
                 const curH = p.isCrouched ? 40 : 64;
@@ -662,6 +668,7 @@
 
                 ctx.restore();
 
+                // Nombre y burbuja de chat sincronizados
                 ctx.save();
                 ctx.translate(p.x, p.y);
                 ctx.fillStyle = '#e2e8f0';
