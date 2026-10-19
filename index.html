@@ -221,12 +221,12 @@
 
         const player = {
             x: 100,
-            y: 100,
+            y: 50,
             vx: 0,
             vy: 0,
             speed: 5.5,
             jumpPower: -13,
-            gravity: 0.65,
+            gravity: 0.6,
             isGrounded: false,
             isCrouched: false,
             direction: 1,
@@ -237,29 +237,27 @@
             chatTimer: 0
         };
 
-        // Coordenadas fijas desde el suelo (groundY fijo para evitar diferencias entre celular y lap)
-        const GROUND_Y = 120;
-
+        // Definición de niveles con plataformas 100% sólidas calculadas desde la base de la pantalla (floorY)
         const levels = {
             1: {
                 title: "Nivel 1: El Comienzo",
                 worldWidth: 2600,
                 platforms: [
-                    { x: 0, y: GROUND_Y, w: 500, h: 120 },
+                    { x: 0, y: 120, w: 500, h: 120 },
                     { x: 580, y: 180, w: 200, h: 40 },
                     { x: 860, y: 240, w: 180, h: 40 },
                     { x: 1120, y: 180, w: 250, h: 40 },
                     { x: 1450, y: 220, w: 200, h: 40 },
                     { x: 1720, y: 160, w: 220, h: 40 },
-                    { x: 2020, y: GROUND_Y, w: 500, h: 120 }
+                    { x: 2020, y: 120, w: 500, h: 120 }
                 ],
-                goal: { x: 2350, y: GROUND_Y, w: 50, h: 80 }
+                goal: { x: 2350, y: 120, w: 50, h: 80 }
             },
             2: {
                 title: "Nivel 2: Desafío Elevado",
                 worldWidth: 2800,
                 platforms: [
-                    { x: 0, y: GROUND_Y, w: 400, h: 120 },
+                    { x: 0, y: 120, w: 400, h: 120 },
                     { x: 480, y: 190, w: 140, h: 30 },
                     { x: 690, y: 260, w: 140, h: 30 },
                     { x: 910, y: 320, w: 160, h: 30 },
@@ -268,15 +266,15 @@
                     { x: 1580, y: 270, w: 150, h: 30 },
                     { x: 1810, y: 340, w: 160, h: 30 },
                     { x: 2050, y: 250, w: 150, h: 30 },
-                    { x: 2280, y: GROUND_Y, w: 500, h: 140 }
+                    { x: 2280, y: 140, w: 500, h: 140 }
                 ],
-                goal: { x: 2600, y: GROUND_Y, w: 50, h: 80 }
+                goal: { x: 2600, y: 140, w: 50, h: 80 }
             },
             3: {
                 title: "Nivel 3: La Gran Cima",
                 worldWidth: 3200,
                 platforms: [
-                    { x: 0, y: GROUND_Y, w: 350, h: 120 },
+                    { x: 0, y: 120, w: 350, h: 120 },
                     { x: 430, y: 180, w: 110, h: 30 },
                     { x: 610, y: 250, w: 100, h: 30 },
                     { x: 780, y: 330, w: 110, h: 30 },
@@ -289,9 +287,9 @@
                     { x: 2120, y: 380, w: 100, h: 30 },
                     { x: 2300, y: 280, w: 110, h: 30 },
                     { x: 2490, y: 180, w: 120, h: 30 },
-                    { x: 2700, y: GROUND_Y, w: 500, h: 150 }
+                    { x: 2700, y: 150, w: 500, h: 150 }
                 ],
-                goal: { x: 3000, y: GROUND_Y, w: 50, h: 80 }
+                goal: { x: 3000, y: 150, w: 50, h: 80 }
             }
         };
 
@@ -350,7 +348,7 @@
             document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
 
             player.x = 100;
-            player.y = 100;
+            player.y = 50;
             player.vy = 0;
 
             socket.emit('joinGame', { 
@@ -474,14 +472,14 @@
             player.isGrounded = false;
             const activeHeight = player.isCrouched ? 40 : player.height;
 
-            // Colisiones precisas usando la coordenada Y desde abajo hacia arriba
+            // Física de colisión sólida de arriba hacia abajo
             lvl.platforms.forEach(plat => {
                 const platTopY = height - plat.y - plat.h;
                 if (
                     player.x + player.width / 2 > plat.x &&
                     player.x - player.width / 2 < plat.x + plat.w &&
                     player.y + activeHeight >= platTopY &&
-                    player.y + activeHeight - player.vy <= platTopY + 15 &&
+                    player.y + activeHeight - player.vy <= platTopY + 20 &&
                     player.vy >= 0
                 ) {
                     player.y = platTopY - activeHeight;
@@ -490,9 +488,10 @@
                 }
             });
 
+            // Si cae al vacío, reaparece arriba a salvo
             if (player.y > height + 100) {
                 player.x = 100;
-                player.y = 100;
+                player.y = 50;
                 player.vy = 0;
             }
 
@@ -556,7 +555,7 @@
             }
 
             player.x = 100;
-            player.y = 100;
+            player.y = 50;
             player.vy = 0;
             document.getElementById('hudLevelTitle').innerText = levels[currentLevel].title;
         }
