@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aventura 2D | Karla & Oscar</title>
+    <title>Aventura de Cartas y Caminata | Karla & Oscar</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -51,20 +51,20 @@
     <!-- CANVAS DEL JUEGO -->
     <canvas id="gameCanvas"></canvas>
 
-    <!-- PANTALLA DE INICIO ÚNICA: SELECCIÓN DE DISPOSITIVO Y PERSONAJE -->
+    <!-- PANTALLA DE INICIO: SELECCIÓN DE DISPOSITIVO Y PERSONAJE -->
     <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl transition-all duration-700">
         <div class="relative z-10 max-w-lg w-full bg-slate-900/90 border border-sky-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl glow-box text-center space-y-6 max-h-[95vh] overflow-y-auto">
             
             <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white text-3xl shadow-lg animate-float">
-                <i class="fa-solid fa-gamepad"></i>
+                <i class="fa-solid fa-envelope-open-text"></i>
             </div>
 
             <div class="space-y-1">
-                <span class="text-[11px] font-bold tracking-[0.2em] text-sky-400 uppercase font-game">Aventura 2D Interactiva</span>
+                <span class="text-[11px] font-bold tracking-[0.2em] text-sky-400 uppercase font-game">Aventura de Cartas y Caminata</span>
                 <h1 class="text-3xl sm:text-4xl font-game font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-amber-300">
                     Karla & Oscar 💕
                 </h1>
-                <p class="text-xs text-slate-300">Selecciona cómo vas a jugar y quién eres</p>
+                <p class="text-xs text-slate-300">Elige tu dispositivo y tu personaje para comenzar</p>
             </div>
 
             <!-- 1. SELECCIÓN DE DISPOSITIVO -->
@@ -98,24 +98,53 @@
             </div>
 
             <button id="btnStart" onclick="startGame()" disabled class="w-full py-4 rounded-2xl font-game font-bold text-slate-950 text-sm uppercase tracking-wider bg-gradient-to-r from-sky-400 via-indigo-400 to-amber-300 opacity-40 cursor-not-allowed shadow-lg transition-all">
-                Entrar al Mundo 2D ✨
+                Iniciar Aventura ✨
             </button>
         </div>
     </div>
 
-    <!-- BOTONES TÁCTILES PARA CELULAR (Se activan solo si eliges celular) -->
+    <!-- BOTONES TÁCTILES PARA CELULAR -->
     <div id="mobileControls" class="hidden absolute inset-0 pointer-events-none z-30 flex justify-between items-end p-6">
-        <div class="flex gap-3 pointer-events-auto">
-            <button ontouchstart="startMove('left')" ontouchend="stopMove('left')" onmousedown="startMove('left')" onmouseup="stopMove('left')" class="w-16 h-16 rounded-2xl bg-slate-900/80 border border-sky-500/40 text-sky-300 text-2xl flex items-center justify-center shadow-lg active:bg-sky-500/30">
+        <div class="flex gap-2 pointer-events-auto">
+            <button ontouchstart="startMove('left')" ontouchend="stopMove('left')" onmousedown="startMove('left')" onmouseup="stopMove('left')" class="w-14 h-14 rounded-2xl bg-slate-900/80 border border-sky-500/40 text-sky-300 text-xl flex items-center justify-center shadow-lg active:bg-sky-500/30">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
-            <button ontouchstart="startMove('right')" ontouchend="stopMove('right')" onmousedown="startMove('right')" onmouseup="stopMove('right')" class="w-16 h-16 rounded-2xl bg-slate-900/80 border border-sky-500/40 text-sky-300 text-2xl flex items-center justify-center shadow-lg active:bg-sky-500/30">
+            <button ontouchstart="startMove('right')" ontouchend="stopMove('right')" onmousedown="startMove('right')" onmouseup="stopMove('right')" class="w-14 h-14 rounded-2xl bg-slate-900/80 border border-sky-500/40 text-sky-300 text-xl flex items-center justify-center shadow-lg active:bg-sky-500/30">
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
-        <div class="pointer-events-auto">
-            <button ontouchstart="jumpAction()" onclick="jumpAction()" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-500 text-white text-2xl flex items-center justify-center shadow-lg active:scale-95">
+        <div class="flex gap-2 pointer-events-auto">
+            <button onclick="interactLetter()" class="w-14 h-14 rounded-2xl bg-amber-500 text-slate-950 text-xl flex items-center justify-center shadow-lg active:scale-95" title="Interactuar / Carta">
+                <i class="fa-solid fa-envelope"></i>
+            </button>
+            <button ontouchstart="crouchAction(true)" ontouchend="crouchAction(false)" onmousedown="crouchAction(true)" onmouseup="crouchAction(false)" class="w-14 h-14 rounded-2xl bg-indigo-600 text-white text-xl flex items-center justify-center shadow-lg active:scale-95" title="Agacharse">
+                <i class="fa-solid fa-arrow-down"></i>
+            </button>
+            <button ontouchstart="jumpAction()" onclick="jumpAction()" class="w-14 h-14 rounded-2xl bg-sky-500 text-white text-xl flex items-center justify-center shadow-lg active:scale-95" title="Saltar">
                 <i class="fa-solid fa-arrow-up"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- AVISO DE INTERACCIÓN (Presionar E o Botón) -->
+    <div id="interactionPrompt" class="absolute bottom-24 left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-300 opacity-0 transform translate-y-4 z-30">
+        <div class="bg-slate-900/90 backdrop-blur-md border border-amber-400/50 text-amber-200 px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-3">
+            <span class="bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded text-xs font-mono font-bold border border-amber-500/40">E</span>
+            <span class="text-xs sm:text-sm font-medium">Presiona <strong class="text-amber-300">E</strong> para abrir la Carta 💌</span>
+        </div>
+    </div>
+
+    <!-- MODAL DE CARTA / MENSAJE -->
+    <div id="letterModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-lg z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-amber-500/40 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative text-center space-y-4">
+            <button onclick="closeLetterModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl border border-amber-500/30">
+                <i class="fa-solid fa-envelope-open-text"></i>
+            </div>
+            <h2 id="modalTitle" class="text-xl font-game font-bold text-amber-200">Carta Especial</h2>
+            <p id="modalMessage" class="text-slate-200 text-sm leading-relaxed text-left bg-slate-950/60 p-4 rounded-2xl border border-slate-800 font-medium"></p>
+            <button onclick="closeLetterModal()" class="w-full py-3 rounded-xl font-game font-bold text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 shadow-lg">
+                Continuar Camino ✨
             </button>
         </div>
     </div>
@@ -127,8 +156,8 @@
                 <i class="fa-solid fa-map"></i>
             </div>
             <div>
-                <h1 class="text-xs sm:text-sm font-game font-bold text-sky-200">Mundo Abierto 2D</h1>
-                <p class="text-[10px] text-slate-400" id="hudStatus">En línea</p>
+                <h1 class="text-xs sm:text-sm font-game font-bold text-sky-200">Camino de Cartas Motivacionales</h1>
+                <p class="text-[10px] text-slate-400" id="hudStatus">Explora hacia adelante y atrás</p>
             </div>
         </div>
 
@@ -196,6 +225,7 @@
             jumpPower: -12,
             speed: 5.5,
             isGrounded: false,
+            isCrouched: false,
             direction: 1,
             width: 36,
             height: 64,
@@ -203,29 +233,48 @@
             chatTimer: 0
         };
 
-        const worldWidth = 3000;
+        const worldWidth = 3500;
         const groundHeight = 130;
         const camera = { x: 0, smoothness: 0.08 };
 
         const keys = { left: false, right: false };
 
-        // Controles de PC por teclado
+        // Definición de las 3 Cartas distribuidas a lo largo del camino
+        const letters = [
+            { id: 1, x: 800, title: "Carta 1: Primera parada", message: "Se te quiere mucho Karla. Recuerda que vales demasiado y que eres única en este mundo. Nunca lo olvides." },
+            { id: 2, x: 1800, title: "Carta 2: Mitad del camino", message: "No te dejes tumbar por nada ni por nadie. Tienes todo mi apoyo para lo que necesites, siempre estoy contigo." },
+            { id: 3, x: 2800, title: "Carta 3: La Meta Final", message: "Sé que a veces hay días difíciles, pero tómate las cosas con calma y acuérdate siempre de lo mucho que vales y de lo lejos que vas a llegar." }
+        ];
+
+        let activeLetterNear = null;
+        let letterModalOpen = false;
+
+        // Controles por Teclado (PC)
         window.addEventListener('keydown', (e) => {
-            if (!gameStarted || selectedDevice !== 'pc') return;
+            if (!gameStarted || selectedDevice !== 'pc' || letterModalOpen) return;
             if (document.activeElement.id === 'chatInput') return;
 
             if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = true;
             if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = true;
             if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w' || e.key === ' ') jumpAction();
+            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
+                localPlayer.isCrouched = true;
+            }
+            if (e.key.toLowerCase() === 'e') {
+                interactLetter();
+            }
         });
 
         window.addEventListener('keyup', (e) => {
             if (!gameStarted || selectedDevice !== 'pc') return;
             if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = false;
             if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = false;
+            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
+                localPlayer.isCrouched = false;
+            }
         });
 
-        // Controles Táctiles para celular
+        // Controles Táctiles (Celular)
         function startMove(dir) {
             if (dir === 'left') keys.left = true;
             if (dir === 'right') keys.right = true;
@@ -235,9 +284,17 @@
             if (dir === 'right') keys.right = false;
         }
         function jumpAction() {
-            if (localPlayer.isGrounded) {
+            if (localPlayer.isGrounded && !localPlayer.isCrouched) {
                 localPlayer.vy = localPlayer.jumpPower;
                 localPlayer.isGrounded = false;
+            }
+        }
+        function crouchAction(isDown) {
+            localPlayer.isCrouched = isDown;
+        }
+        function interactLetter() {
+            if (activeLetterNear) {
+                openLetterModal(activeLetterNear);
             }
         }
 
@@ -248,7 +305,6 @@
 
             document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
 
-            // Si seleccionó celular, mostramos los botones táctiles en pantalla
             if (selectedDevice === 'mobile') {
                 document.getElementById('mobileControls').classList.remove('hidden');
             }
@@ -298,20 +354,14 @@
         }
         function handleChatKey(e) { if (e.key === 'Enter') sendChatMessage(); }
 
-        const sceneryElements = [
-            { type: 'tree', x: 400 },
-            { type: 'rock', x: 900 },
-            { type: 'tree', x: 1400 },
-            { type: 'rock', x: 2000 },
-            { type: 'tree', x: 2500 }
-        ];
-
         function updateGame() {
-            if (!gameStarted) return;
+            if (!gameStarted || letterModalOpen) return;
 
             let vx = 0;
-            if (keys.left) { vx = -localPlayer.speed; localPlayer.direction = -1; }
-            if (keys.right) { vx = localPlayer.speed; localPlayer.direction = 1; }
+            if (!localPlayer.isCrouched) {
+                if (keys.left) { vx = -localPlayer.speed; localPlayer.direction = -1; }
+                if (keys.right) { vx = localPlayer.speed; localPlayer.direction = 1; }
+            }
 
             localPlayer.x += vx;
             localPlayer.vy += localPlayer.gravity;
@@ -320,8 +370,8 @@
             const floorY = height - groundHeight;
             localPlayer.isGrounded = false;
 
-            if (localPlayer.y >= floorY - localPlayer.height) {
-                localPlayer.y = floorY - localPlayer.height;
+            if (localPlayer.y >= floorY - (localPlayer.isCrouched ? 40 : localPlayer.height)) {
+                localPlayer.y = floorY - (localPlayer.isCrouched ? 40 : localPlayer.height);
                 localPlayer.vy = 0;
                 localPlayer.isGrounded = true;
             }
@@ -329,25 +379,55 @@
             if (localPlayer.x < 50) localPlayer.x = 50;
             if (localPlayer.x > worldWidth - 50) localPlayer.x = worldWidth - 50;
 
+            // Detectar proximidad a las cartas
+            activeLetterNear = null;
+            letters.forEach(letObj => {
+                if (Math.abs(localPlayer.x - letObj.x) < 60) {
+                    activeLetterNear = letObj;
+                }
+            });
+
+            const promptEl = document.getElementById('interactionPrompt');
+            if (activeLetterNear && !letterModalOpen) {
+                promptEl.classList.remove('opacity-0', 'translate-y-4');
+            } else {
+                promptEl.classList.add('opacity-0', 'translate-y-4');
+            }
+
             if (localPlayer.chatTimer > 0) localPlayer.chatTimer--;
 
             if (myId && players[myId]) {
                 players[myId].x = localPlayer.x;
                 players[myId].y = localPlayer.y;
                 players[myId].direction = localPlayer.direction;
+                players[myId].isCrouched = localPlayer.isCrouched;
                 players[myId].chatMessage = localPlayer.chatMessage;
                 players[myId].chatTimer = localPlayer.chatTimer;
 
                 socket.emit('playerMovement', {
                     x: localPlayer.x,
                     y: localPlayer.y,
-                    direction: localPlayer.direction
+                    direction: localPlayer.direction,
+                    isCrouched: localPlayer.isCrouched
                 });
             }
 
             camera.x += ((localPlayer.x - width / 2) - camera.x) * camera.smoothness;
             if (camera.x < 0) camera.x = 0;
             if (camera.x > worldWidth - width) camera.x = worldWidth - width;
+        }
+
+        function openLetterModal(letObj) {
+            letterModalOpen = true;
+            document.getElementById('modalTitle').innerText = letObj.title;
+            document.getElementById('modalMessage').innerText = letObj.message;
+            document.getElementById('letterModal').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('interactionPrompt').classList.add('opacity-0', 'translate-y-4');
+        }
+
+        function closeLetterModal() {
+            letterModalOpen = false;
+            document.getElementById('letterModal').classList.add('opacity-0', 'pointer-events-none');
         }
 
         function renderGame() {
@@ -358,19 +438,27 @@
 
             const floorY = height - groundHeight;
 
-            // Elementos de decoración del paisaje de fondo
-            sceneryElements.forEach(el => {
-                ctx.fillStyle = '#1e293b';
-                if (el.type === 'tree') {
-                    ctx.fillRect(el.x + 15, floorY - 90, 20, 90);
-                    ctx.fillStyle = '#059669';
-                    ctx.beginPath(); ctx.arc(el.x + 25, floorY - 90, 40, 0, Math.PI * 2); ctx.fill();
-                } else {
-                    ctx.beginPath();
-                    ctx.roundRect(el.x, floorY - 35, 60, 35, [15, 15, 0, 0]);
-                    ctx.fillStyle = '#475569';
-                    ctx.fill();
-                }
+            // Dibujar las Cartas en el escenario
+            letters.forEach(letObj => {
+                const lY = floorY - 50;
+                ctx.fillStyle = '#f59e0b';
+                ctx.beginPath();
+                ctx.roundRect(letObj.x - 20, lY, 40, 30, 6);
+                ctx.fill();
+                ctx.strokeStyle = '#fef3c7';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Ícono de sobre o carta
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px FontAwesome';
+                ctx.textAlign = 'center';
+                ctx.fillText('✉️', letObj.x, lY + 20);
+
+                // Texto indicador flotante
+                ctx.fillStyle = '#fef3c7';
+                ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
+                ctx.fillText('¡Carta!', letObj.x, lY - 10);
             });
 
             // Suelo sólido 2D
@@ -382,10 +470,11 @@
             // Dibujar jugadores
             Object.values(players).forEach(p => {
                 ctx.save();
-                ctx.translate(p.x, floorY - localPlayer.height + (p.y || 0));
+                const currentHeight = p.isCrouched ? 40 : localPlayer.height;
+                ctx.translate(p.x, floorY - currentHeight + (p.y || 0));
 
                 ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                ctx.beginPath(); ctx.ellipse(localPlayer.width / 2, localPlayer.height + 4, 16, 5, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(localPlayer.width / 2, currentHeight + 4, 16, 5, 0, 0, Math.PI * 2); ctx.fill();
 
                 if (p.direction === -1) {
                     ctx.translate(localPlayer.width, 0);
@@ -395,26 +484,20 @@
                 // Cuerpo del avatar
                 ctx.fillStyle = p.role === 'karla' ? '#0284c7' : '#4f46e5';
                 ctx.beginPath();
-                ctx.roundRect(0, 18, localPlayer.width, 46, 8);
+                ctx.roundRect(0, p.isCrouched ? 10 : 18, localPlayer.width, p.isCrouched ? 30 : 46, 8);
                 ctx.fill();
 
                 // Cabeza
                 ctx.fillStyle = '#fed7aa';
                 ctx.beginPath();
-                ctx.arc(localPlayer.width / 2, 12, 13, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Cabello o sombrero
-                ctx.fillStyle = p.role === 'karla' ? '#7c2d12' : '#1e1b4b';
-                ctx.beginPath();
-                ctx.arc(localPlayer.width / 2, 8, 14, Math.PI, Math.PI * 2);
+                ctx.arc(localPlayer.width / 2, p.isCrouched ? 2 : 12, 13, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.restore();
 
                 // Nombre y Chat flotante
                 ctx.save();
-                ctx.translate(p.x, floorY - localPlayer.height + (p.y || 0));
+                ctx.translate(p.x, floorY - currentHeight + (p.y || 0));
                 ctx.fillStyle = '#f8fafc';
                 ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
                 ctx.textAlign = 'center';
