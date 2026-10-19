@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aventura Estelar | Karla & Oscar</title>
+    <title>Aventura Parkour | Karla & Oscar</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -60,42 +60,27 @@
     <!-- CANVAS DEL JUEGO -->
     <canvas id="gameCanvas"></canvas>
 
-    <!-- PANTALLA DE INICIO -->
+    <!-- PANTALLA DE INICIO SIMPLIFICADA (SIN SELECCIÓN DE DISPOSITIVO) -->
     <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-2xl transition-all duration-700">
         <canvas id="uniquePortalCanvas" class="absolute inset-0 pointer-events-none opacity-30"></canvas>
 
         <div class="relative z-10 max-w-lg w-full unique-start-card rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl max-h-[95vh] overflow-y-auto">
             
             <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-sky-400 via-indigo-500 to-pink-500 flex items-center justify-center text-white text-3xl shadow-2xl animate-pulse">
-                <i class="fa-solid fa-compass-drafting"></i>
+                <i class="fa-solid fa-gamepad"></i>
             </div>
 
             <div class="space-y-2">
-                <span class="text-[11px] font-orbitron font-extrabold tracking-[0.3em] text-pink-400 uppercase">Experiencia Interactiva 2D</span>
+                <span class="text-[11px] font-orbitron font-extrabold tracking-[0.3em] text-pink-400 uppercase">Aventura Interactiva 2D</span>
                 <h1 class="text-2xl sm:text-3xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-200 to-pink-400">
-                    AVENTURA DE CARTAS
+                    KARLA & OSCAR 💕
                 </h1>
-                <p class="text-xs text-slate-300">Elige tu dispositivo y tu personaje para despegar</p>
+                <p class="text-xs text-slate-300">Elige tu personaje para comenzar el parkour</p>
             </div>
 
-            <!-- SELECCIÓN DE DISPOSITIVO -->
+            <!-- SELECCIÓN DE PERSONAJE -->
             <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-left space-y-2">
-                <h3 class="text-[11px] font-orbitron font-bold text-sky-300 uppercase tracking-wider text-center">1. Selecciona tu Dispositivo</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="setDevice('pc')" id="btnPC" class="p-3 rounded-xl border border-slate-700 bg-slate-950 text-center transition-all flex flex-col items-center gap-1 glow-hover">
-                        <i class="fa-solid fa-laptop text-xl text-sky-400"></i>
-                        <span class="font-bold text-slate-200 text-xs font-orbitron">Computadora (PC)</span>
-                    </button>
-                    <button onclick="setDevice('mobile')" id="btnMobile" class="p-3 rounded-xl border border-slate-700 bg-slate-950 text-center transition-all flex flex-col items-center gap-1 glow-hover">
-                        <i class="fa-solid fa-mobile-screen text-xl text-pink-400"></i>
-                        <span class="font-bold text-slate-200 text-xs font-orbitron">Celular / Tablet</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- SELECCIÓN DE PILOTO / PERSONAJE -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-left space-y-2">
-                <h3 class="text-[11px] font-orbitron font-bold text-sky-300 uppercase tracking-wider text-center">2. Elige tu Identidad</h3>
+                <h3 class="text-[11px] font-orbitron font-bold text-sky-300 uppercase tracking-wider text-center">Selecciona tu Personaje</h3>
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="selectRole('karla')" id="btnKarla" class="p-3 rounded-xl border border-sky-500/30 bg-sky-500/10 text-center transition-all flex flex-col items-center gap-1 glow-hover">
                         <i class="fa-solid fa-user-astronaut text-xl text-sky-400"></i>
@@ -109,13 +94,13 @@
             </div>
 
             <button id="btnStart" onclick="startGame()" disabled class="w-full py-4 rounded-2xl font-orbitron font-bold text-slate-950 text-xs tracking-widest uppercase bg-gradient-to-r from-sky-400 via-indigo-300 to-pink-400 opacity-40 cursor-not-allowed shadow-lg glow-hover transition-all">
-                Iniciar Aventura Estelar 🚀
+                Entrar al Nivel 🚀
             </button>
         </div>
     </div>
 
-    <!-- BOTONES TÁCTILES (SOLO CELULAR) -->
-    <div id="touchControls" class="hidden absolute inset-0 pointer-events-none z-30 flex justify-between items-end p-6">
+    <!-- BOTONES TÁCTILES FLOTANTES (SIEMPRE DISPONIBLES POR SI JUEGAS EN CELULAR) -->
+    <div id="touchControls" class="absolute inset-0 pointer-events-none z-30 flex justify-between items-end p-6">
         <div class="flex gap-2 pointer-events-auto">
             <button ontouchstart="pressKey('left')" ontouchend="releaseKey('left')" onmousedown="pressKey('left')" onmouseup="releaseKey('left')" class="w-16 h-16 rounded-2xl bg-slate-900/80 border border-sky-500/40 text-sky-300 text-xl flex items-center justify-center shadow-lg active:bg-sky-500/30">
                 <i class="fa-solid fa-arrow-left"></i>
@@ -145,7 +130,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CARTA CON FOTO Y MENSAJES ESPECÍFICOS -->
+    <!-- MODAL DE CARTA CON FOTO RANDOM REAL -->
     <div id="letterModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-lg z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
         <div class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-amber-500/40 rounded-3xl max-w-md w-full p-6 shadow-2xl relative text-center space-y-4 max-h-[90vh] overflow-y-auto">
             <button onclick="closeLetterModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -156,7 +141,6 @@
             
             <h2 id="modalTitle" class="text-xl font-orbitron font-bold text-amber-200">Carta Especial</h2>
             
-            <!-- FOTO RANDOM -->
             <div class="rounded-xl overflow-hidden bg-slate-950 border border-amber-500/30 max-h-[220px] flex items-center justify-center p-2">
                 <img id="modalPhoto" src="" alt="Recuerdo" class="max-h-[200px] w-auto object-contain rounded-lg">
             </div>
@@ -169,7 +153,7 @@
         </div>
     </div>
 
-    <!-- MODAL FINAL DE VICTORIA -->
+    <!-- MODAL FINAL DE VICTORIA CON EL MENSAJE PEDIDO -->
     <div id="victoryModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500">
         <div class="bg-slate-900 border border-pink-500/40 rounded-3xl max-w-md w-full p-6 text-center space-y-5 shadow-2xl">
             <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-pink-500 to-amber-400 flex items-center justify-center text-slate-950 text-3xl font-bold shadow-xl animate-bounce">
@@ -177,7 +161,7 @@
             </div>
             <h2 class="text-2xl font-orbitron font-bold text-pink-300">¡Aventura Completada! 🎉</h2>
             <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-medium bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
-                Has descubierto todas las cartas del camino. Recuerda siempre lo mucho que vales y que cuentas con todo mi apoyo. ¡Eres increíble! 💕
+                Espero te haya gustado, solamente te quería distraer un rato con algo jajajajaja se te quiere 💕
             </p>
             <button onclick="location.reload()" class="w-full py-3.5 rounded-xl font-orbitron font-bold text-slate-950 bg-gradient-to-r from-sky-400 via-indigo-300 to-pink-300 shadow-lg text-xs">
                 Volver a Jugar 🌟
@@ -193,7 +177,7 @@
             </div>
             <div>
                 <h1 class="text-xs sm:text-sm font-orbitron font-bold text-sky-200">Cartas Descubiertas: <span id="cardsCount">0</span>/3</h1>
-                <p class="text-[10px] text-slate-400" id="hudStatus">Explora hacia adelante y atrás</p>
+                <p class="text-[10px] text-slate-400" id="hudStatus">Supera los saltos de parkour</p>
             </div>
         </div>
 
@@ -212,26 +196,16 @@
 
     <script>
         const socket = typeof io !== 'undefined' ? io() : { on: () => {}, emit: () => {} };
-        let selectedDevice = null;
         let selectedRole = null;
         let gameStarted = false;
         let myId = null;
-
-        function setDevice(device) {
-            selectedDevice = device;
-            document.getElementById('btnPC').style.borderColor = device === 'pc' ? '#38bdf8' : '#334155';
-            document.getElementById('btnMobile').style.borderColor = device === 'mobile' ? '#ec4899' : '#334155';
-            if (device === 'mobile') {
-                document.getElementById('touchControls').classList.remove('hidden');
-            }
-        }
 
         function selectRole(role) {
             selectedRole = role;
             document.getElementById('btnKarla').style.borderColor = role === 'karla' ? '#38bdf8' : 'rgba(56,189,248,0.2)';
             document.getElementById('btnOscar').style.borderColor = role === 'oscar' ? '#818cf8' : 'rgba(129,140,248,0.2)';
             
-            if (selectedDevice && selectedRole) {
+            if (selectedRole) {
                 const btn = document.getElementById('btnStart');
                 btn.disabled = false;
                 btn.classList.remove('opacity-40', 'cursor-not-allowed');
@@ -291,19 +265,22 @@
             chatTimer: 0
         };
 
+        // NIVEL LARGO CON RETO DE PARKOUR MÁS DINÁMICO
         const longLevel = {
-            worldWidth: 3500,
+            worldWidth: 3800,
             platforms: [
-                { x: 0, y: 120, w: 500, h: 120 },
-                { x: 580, y: 160, w: 200, h: 40 },
-                { x: 860, y: 210, w: 180, h: 40 },
-                { x: 1120, y: 150, w: 250, h: 40 },
-                { x: 1450, y: 190, w: 200, h: 40 },
-                { x: 1720, y: 130, w: 220, h: 40 },
-                { x: 2020, y: 200, w: 250, h: 40 },
-                { x: 2340, y: 270, w: 200, h: 40 },
-                { x: 2620, y: 180, w: 220, h: 40 },
-                { x: 2920, y: 120, w: 600, h: 120 }
+                { x: 0, y: 120, w: 450, h: 120 },
+                { x: 530, y: 190, w: 150, h: 30 },
+                { x: 760, y: 260, w: 140, h: 30 },
+                { x: 990, y: 180, w: 180, h: 30 },
+                { x: 1260, y: 270, w: 130, h: 30 },
+                { x: 1480, y: 340, w: 150, h: 30 },
+                { x: 1720, y: 220, w: 160, h: 30 },
+                { x: 1970, y: 150, w: 180, h: 30 },
+                { x: 2240, y: 240, w: 150, h: 30 },
+                { x: 2480, y: 320, w: 140, h: 30 },
+                { x: 2710, y: 210, w: 170, h: 30 },
+                { x: 2970, y: 130, w: 750, h: 120 }
             ]
         };
 
@@ -311,11 +288,11 @@
         const camera = { x: 0, smoothness: 0.08 };
         const keys = { left: false, right: false };
 
-        // 3 CARTAS CON FOTOS Y MENSAJES EXACTOS
+        // 3 CARTAS CON LOS NOMBRES DE ARCHIVO EXACTOS Y LOS MENSAJES
         const letters = [
             { 
                 id: 1, 
-                x: 950, 
+                x: 1080, 
                 title: "Carta 1: Primer Recuerdo", 
                 message: "Foto random que encontré. Se te quiere mucho Karla. Recuerda que vales demasiado y que eres única en este mundo. Nunca lo olvides.", 
                 photo: "WhatsApp Image 2026-10-18 at 10.50.09 PM.jpeg", 
@@ -323,18 +300,18 @@
             },
             { 
                 id: 2, 
-                x: 2100, 
+                x: 2320, 
                 title: "Carta 2: Segundo Recuerdo", 
                 message: "Foto random que encontré. No te dejes tumbar por nada ni por nadie. Tienes todo mi apoyo para lo que necesites, siempre estoy contigo.", 
-                photo: "WhatsApp Image 2026-10-18 at 10.50.09 PM (1)_2.jpeg", 
+                photo: "WhatsApp Image 2026-10-18 at 10.50.09 PM (1)_3.jpeg", 
                 opened: false 
             },
             { 
                 id: 3, 
-                x: 3200, 
+                x: 3320, 
                 title: "Carta 3: Meta Final", 
                 message: "Foto random que encontré. Sé que a veces hay días difíciles, pero tómate las cosas con calma y acuérdate siempre de lo mucho que vales y de lo lejos que vas a llegar.", 
-                photo: "WhatsApp Image 2026-10-18 at 11.08.12 PM_2.jpeg", 
+                photo: "WhatsApp Image 2026-10-18 at 11.08.12 PM_3.jpeg", 
                 opened: false 
             }
         ];
@@ -344,7 +321,7 @@
         let openedCardsCount = 0;
 
         window.addEventListener('keydown', (e) => {
-            if (!gameStarted || selectedDevice !== 'pc' || letterModalOpen) return;
+            if (!gameStarted || letterModalOpen) return;
             if (document.activeElement.id === 'chatInput') return;
 
             if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = true;
@@ -355,7 +332,7 @@
         });
 
         window.addEventListener('keyup', (e) => {
-            if (!gameStarted || selectedDevice !== 'pc') return;
+            if (!gameStarted) return;
             if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = false;
             if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = false;
             if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') localPlayer.isCrouched = false;
@@ -393,7 +370,7 @@
         }
 
         function startGame() {
-            if (!selectedDevice || !selectedRole) return;
+            if (!selectedRole) return;
             gameStarted = true;
             myId = socket.id;
 
@@ -451,7 +428,7 @@
 
             const activeHeight = localPlayer.isCrouched ? 40 : localPlayer.height;
 
-            // Colisiones con el suelo principal
+            // Colisión con el suelo
             if (
                 localPlayer.x + localPlayer.width / 2 > 0 &&
                 localPlayer.x - localPlayer.width / 2 < longLevel.worldWidth &&
@@ -464,7 +441,7 @@
                 localPlayer.isGrounded = true;
             }
 
-            // Colisiones con las plataformas
+            // Colisión con las plataformas de parkour
             longLevel.platforms.forEach(plat => {
                 const platY = height - plat.y;
                 if (
