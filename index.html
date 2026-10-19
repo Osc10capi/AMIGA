@@ -161,7 +161,7 @@
     <div id="statusBanner" class="absolute top-20 left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-300 opacity-100 z-20">
         <div id="statusBannerContent" class="bg-slate-900/90 backdrop-blur-md border border-sky-400/40 text-sky-200 px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-2 text-xs font-medium">
             <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-            <span id="statusBannerText">Esperando a que Oscar se conecte a la sala... (puedes jugar mientras)</span>
+            <span id="statusBannerText">Esperando a que la otra persona se conecte a la sala... (puedes jugar mientras)</span>
         </div>
     </div>
 
@@ -299,11 +299,11 @@
         resizeCanvas();
 
         let players = {};
-        let myId = 'local_player';
+        let myId = socket.id || 'local_player';
 
         const player = {
             x: 100,
-            y: 100, // Posición inicial segura dentro del campo visible
+            y: 100,
             vx: 0,
             vy: 0,
             speed: 5.5,
@@ -431,9 +431,9 @@
         function joinGame() {
             if (!selectedRole) return;
             gameStarted = true;
+            myId = socket.id || 'local_player';
             document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
 
-            // Posicionar al personaje de forma segura sobre la plataforma inicial al comenzar
             player.x = 100;
             player.y = height - 260;
             player.vy = 0;
@@ -465,6 +465,7 @@
 
         socket.on('currentPlayers', (serverPlayers) => {
             players = serverPlayers;
+            if (!myId || myId === 'local_player') myId = socket.id;
             updateStatusBanner();
         });
         socket.on('playerMoved', (pData) => { if (players[pData.id]) players[pData.id] = pData; });
@@ -585,7 +586,7 @@
 
             if (player.chatTimer > 0) player.chatTimer--;
 
-            if (players[myId]) {
+            if (myId && players[myId]) {
                 players[myId].x = player.x;
                 players[myId].y = player.y;
                 players[myId].direction = player.direction;
@@ -759,7 +760,7 @@
 
                     ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
                     ctx.strokeStyle = '#38bdf8';
-                    ctx.lineWidth = 1;
+                    ctx.lineWidth = **1**;
                     ctx.beginPath();
                     ctx.roundRect(-bw / 2, -35 - bh, bw, bh, 6);
                     ctx.fill();
