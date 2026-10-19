@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aventura Parkour | Karla</title>
+    <title>Aventura Parkour | Karla & Oscar</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -60,7 +60,7 @@
     <!-- CANVAS DEL JUEGO -->
     <canvas id="gameCanvas"></canvas>
 
-    <!-- PANTALLA DE INICIO PARA KARLA -->
+    <!-- PANTALLA DE INICIO -->
     <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-2xl transition-all duration-700">
         <canvas id="uniquePortalCanvas" class="absolute inset-0 pointer-events-none opacity-30"></canvas>
 
@@ -71,14 +71,28 @@
             </div>
 
             <div class="space-y-2">
-                <span class="text-[11px] font-orbitron font-extrabold tracking-[0.3em] text-pink-400 uppercase">Aventura Exclusiva</span>
                 <h1 class="text-3xl sm:text-4xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-200 to-pink-400">
                     PARA KARLA ✨
                 </h1>
-                <p class="text-xs text-slate-300">Prepárate para este reto de parkour accesible y divertido</p>
+                <p class="text-xs text-slate-300">Selecciona quién va a jugar</p>
             </div>
 
-            <button onclick="startGame()" class="w-full py-4 rounded-2xl font-orbitron font-bold text-slate-950 text-xs tracking-widest uppercase bg-gradient-to-r from-sky-400 via-indigo-300 to-pink-400 shadow-lg glow-hover transition-all">
+            <!-- SELECCIÓN DE PERSONAJE -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-left space-y-2">
+                <h3 class="text-[11px] font-orbitron font-bold text-sky-300 uppercase tracking-wider text-center">Selecciona cual personaje</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="selectRole('karla')" id="btnKarla" class="p-3 rounded-xl border border-sky-500/30 bg-sky-500/10 text-center transition-all flex flex-col items-center gap-1 glow-hover">
+                        <i class="fa-solid fa-user-astronaut text-xl text-sky-400"></i>
+                        <span class="font-bold text-sky-200 text-xs font-orbitron">Karla</span>
+                    </button>
+                    <button onclick="selectRole('oscar')" id="btnOscar" class="p-3 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-center transition-all flex flex-col items-center gap-1 glow-hover">
+                        <i class="fa-solid fa-robot text-xl text-indigo-400"></i>
+                        <span class="font-bold text-indigo-200 text-xs font-orbitron">Oscar</span>
+                    </button>
+                </div>
+            </div>
+
+            <button id="btnStart" onclick="startGame()" disabled class="w-full py-4 rounded-2xl font-orbitron font-bold text-slate-950 text-xs tracking-widest uppercase bg-gradient-to-r from-sky-400 via-indigo-300 to-pink-400 opacity-40 cursor-not-allowed shadow-lg glow-hover transition-all">
                 Entrar al Nivel 🚀
             </button>
         </div>
@@ -154,15 +168,15 @@
         </div>
     </div>
 
-    <!-- UI SUPERIOR -->
+    <!-- UI SUPERIOR CON INDICADOR DE QUIÉN ESTÁ JUGANDO -->
     <div class="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none z-20">
         <div class="bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-sky-500/30 shadow-lg pointer-events-auto flex items-center gap-3">
             <div class="w-8 h-8 rounded-xl bg-sky-500 flex items-center justify-center text-white text-xs font-bold">
-                <i class="fa-solid fa-envelope"></i>
+                <i class="fa-solid fa-user"></i>
             </div>
             <div>
-                <h1 class="text-xs sm:text-sm font-orbitron font-bold text-sky-200">Cartas Descubiertas: <span id="cardsCount">0</span>/3</h1>
-                <p class="text-[10px] text-slate-400" id="hudStatus">¡Escalones a una altura accesible y divertida!</p>
+                <h1 class="text-xs sm:text-sm font-orbitron font-bold text-sky-200">Jugando: <span id="whoIsPlaying" class="text-pink-400">Seleccionando...</span></h1>
+                <p class="text-[10px] text-slate-400" id="hudStatus">Cartas Descubiertas: <span id="cardsCount">0</span>/3</p>
             </div>
         </div>
 
@@ -181,8 +195,21 @@
 
     <script>
         const socket = typeof io !== 'undefined' ? io() : { on: () => {}, emit: () => {} };
+        let selectedRole = null;
         let gameStarted = false;
         let myId = null;
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.getElementById('btnKarla').style.borderColor = role === 'karla' ? '#38bdf8' : 'rgba(56,189,248,0.2)';
+            document.getElementById('btnOscar').style.borderColor = role === 'oscar' ? '#818cf8' : 'rgba(129,140,248,0.2)';
+            
+            if (selectedRole) {
+                const btn = document.getElementById('btnStart');
+                btn.disabled = false;
+                btn.classList.remove('opacity-40', 'cursor-not-allowed');
+            }
+        }
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -237,22 +264,40 @@
             chatTimer: 0
         };
 
-        // PLATAFORMAS AJUSTADAS UN POCO MÁS ABAJO PARA QUE SEAN FÁCILES DE ALCANZAR
+        // PLATAFORMAS CON RUTAS MÚLTIPLES (CAMINOS ALTOS Y BAJOS PARA ESCOGER)
         const longLevel = {
             worldWidth: 3800,
             platforms: [
-                { x: 0, y: 120, w: 380, h: 120 },
-                { x: 470, y: 210, w: 130, h: 30 },
-                { x: 680, y: 320, w: 120, h: 30 },
-                { x: 910, y: 230, w: 140, h: 30 },
-                { x: 1160, y: 340, w: 120, h: 30 },
-                { x: 1390, y: 430, w: 130, h: 30 },
-                { x: 1630, y: 310, w: 130, h: 30 },
-                { x: 1870, y: 210, w: 140, h: 30 },
-                { x: 2120, y: 320, w: 120, h: 30 },
-                { x: 2350, y: 410, w: 130, h: 30 },
-                { x: 2590, y: 290, w: 130, h: 30 },
-                { x: 2840, y: 130, w: 850, h: 120 }
+                { x: 0, y: 120, w: 350, h: 120 },
+                // Ruta Alternativa 1 (Elección Alta vs Baja)
+                { x: 420, y: 280, w: 110, h: 30 }, // Alto
+                { x: 420, y: 150, w: 110, h: 30 }, // Bajo
+                { x: 600, y: 420, w: 120, h: 30 }, // Más alto
+                { x: 600, y: 220, w: 120, h: 30 }, // Medio
+                // Zona Carta 1
+                { x: 820, y: 310, w: 140, h: 30 },
+                { x: 820, y: 180, w: 140, h: 30 },
+                // Ruta Alternativa 2
+                { x: 1040, y: 450, w: 110, h: 30 },
+                { x: 1040, y: 230, w: 110, h: 30 },
+                { x: 1250, y: 540, w: 120, h: 30 },
+                { x: 1250, y: 350, w: 120, h: 30 },
+                { x: 1480, y: 410, w: 120, h: 30 },
+                { x: 1480, y: 220, w: 120, h: 30 },
+                // Zona Carta 2
+                { x: 1720, y: 330, w: 140, h: 30 },
+                { x: 1720, y: 190, w: 140, h: 30 },
+                // Ruta Alternativa 3
+                { x: 1950, y: 460, w: 110, h: 30 },
+                { x: 1950, y: 250, w: 110, h: 30 },
+                { x: 2170, y: 550, w: 120, h: 30 },
+                { x: 2170, y: 340, w: 120, h: 30 },
+                { x: 2400, y: 410, w: 120, h: 30 },
+                { x: 2400, y: 220, w: 120, h: 30 },
+                // Zona Carta 3 y Meta final
+                { x: 2640, y: 320, w: 140, h: 30 },
+                { x: 2640, y: 180, w: 140, h: 30 },
+                { x: 2880, y: 130, w: 900, h: 120 }
             ]
         };
 
@@ -260,11 +305,10 @@
         const camera = { x: 0, smoothness: 0.08 };
         const keys = { left: false, right: false };
 
-        // 3 CARTAS CON LAS FOTOS RENOMBRADAS COMO FOTO1, FOTO2 Y FOTO3
         const letters = [
             { 
                 id: 1, 
-                x: 970, 
+                x: 880, 
                 title: "Carta 1: Primer Recuerdo", 
                 message: "Se te quiere mucho Karla. Recuerda que vales demasiado y que eres única en este mundo. Nunca lo olvides.", 
                 photo: "foto1.jpg", 
@@ -272,7 +316,7 @@
             },
             { 
                 id: 2, 
-                x: 2180, 
+                x: 1780, 
                 title: "Carta 2: Segundo Recuerdo", 
                 message: "No te dejes tumbar por nada ni por nadie. Tienes todo mi apoyo para lo que necesites, siempre estoy contigo.", 
                 photo: "foto2.jpg", 
@@ -280,7 +324,7 @@
             },
             { 
                 id: 3, 
-                x: 3350, 
+                x: 2700, 
                 title: "Carta 3: Meta Final", 
                 message: "Sé que a veces hay días difíciles, pero tómate las cosas con calma y acuérdate siempre de lo mucho que vales y de lo lejos que vas a llegar.", 
                 photo: "foto3.jpg", 
@@ -342,14 +386,17 @@
         }
 
         function startGame() {
+            if (!selectedRole) return;
             gameStarted = true;
             myId = socket.id;
 
+            const nameStr = selectedRole === 'karla' ? 'Karla' : 'Oscar';
+            document.getElementById('whoIsPlaying').innerText = nameStr;
             document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
 
             socket.emit('joinGame', {
-                name: 'Karla',
-                role: 'karla'
+                name: nameStr,
+                role: selectedRole
             });
 
             initAudio();
@@ -556,7 +603,7 @@
 
                 if (p.direction === -1) ctx.scale(-1, 1);
 
-                ctx.fillStyle = '#0284c7';
+                ctx.fillStyle = p.role === 'karla' ? '#0284c7' : '#4f46e5';
                 ctx.beginPath();
                 ctx.roundRect(-12, -curH + 18, 24, curH - 20, 6);
                 ctx.fill();
