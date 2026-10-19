@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aventura Parkour Motivacional | Karla & Oscar</title>
+    <title>Carrera Estelar Motivacional | Karla & Oscar</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -11,7 +11,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <!-- Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
 
@@ -22,344 +22,243 @@
             -webkit-user-select: none;
             touch-action: manipulation;
             overflow: hidden;
-            background-color: #0d1117;
-            color: #f0f6fc;
+            background-color: #030712;
+            color: #f3f4f6;
         }
 
-        .font-game { font-family: 'Fredoka', cursive; }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
 
         #gameCanvas {
             display: block;
             width: 100vw;
             height: 100vh;
-            background: #0d1117;
+            background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
         }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
-        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.4); border-radius: 10px; }
-
-        .glow-btn {
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        /* Animación única de neón para el inicio */
+        @keyframes cyber-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.4), inset 0 0 15px rgba(56, 189, 248, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(129, 140, 248, 0.8), inset 0 0 25px rgba(129, 140, 248, 0.4); }
         }
 
-        @keyframes pulse-subtle {
-            0%, 100% { transform: scale(1); opacity: 0.95; }
-            50% { transform: scale(1.03); opacity: 1; }
+        .cyber-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(3, 7, 18, 0.95) 100%);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            animation: cyber-glow 4s infinite ease-in-out;
         }
-        .animate-pulse-subtle {
-            animation: pulse-subtle 2.5s infinite ease-in-out;
+
+        .glow-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glow-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
         }
     </style>
 </head>
-<body class="relative w-screen h-screen overflow-hidden bg-slate-950 text-slate-100 font-sans">
+<body class="relative w-screen h-screen overflow-hidden bg-slate-950 text-slate-100">
 
     <!-- CANVAS DEL JUEGO -->
     <canvas id="gameCanvas"></canvas>
 
-    <!-- PANTALLA DE INICIO: SELECCIÓN DE PERSONAJE -->
-    <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl transition-all duration-700">
-        <canvas id="startParticleCanvas" class="absolute inset-0 pointer-events-none"></canvas>
+    <!-- PANTALLA DE INICIO ÚNICA Y ESTILIZADA -->
+    <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-2xl transition-all duration-700">
+        <canvas id="portalCanvas" class="absolute inset-0 pointer-events-none opacity-40"></canvas>
 
-        <div class="relative z-10 max-w-xl w-full bg-slate-900/90 border border-sky-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6 max-h-[92vh] overflow-y-auto">
+        <div class="relative z-10 max-w-lg w-full cyber-card rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl">
             
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-500 text-white text-3xl shadow-lg animate-pulse-subtle">
-                <i class="fa-solid fa-gamepad"></i>
+            <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-500 to-pink-500 flex items-center justify-center text-white text-3xl shadow-xl animate-bounce">
+                <i class="fa-solid fa-meteor"></i>
             </div>
 
             <div class="space-y-2">
-                <span class="text-xs font-bold tracking-widest text-sky-400 uppercase">Aventura de Parkour y Motivación</span>
-                <h1 class="text-3xl sm:text-4xl font-game font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-amber-300">
-                    ¿Quién eres? 🌟
+                <span class="text-[10px] font-orbitron font-bold tracking-[0.3em] text-sky-400 uppercase">Sincronización Multijugador</span>
+                <h1 class="text-3xl sm:text-4xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-pink-400">
+                    CARRERA ESTELAR
                 </h1>
-                <p class="text-xs sm:text-sm text-slate-300">Selecciona tu personaje para comenzar</p>
+                <p class="text-xs text-slate-300">Selecciona quién eres para iniciar el viaje</p>
             </div>
 
-            <!-- SELECCIÓN DE PERSONAJE -->
-            <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 text-left space-y-3">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Elige tu identidad</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="selectRole('karla')" id="btnKarla" class="p-5 rounded-xl border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 text-center transition-all flex flex-col items-center gap-2">
-                        <i class="fa-solid fa-user-astronaut text-3xl text-sky-400"></i>
-                        <span class="font-bold text-sky-200 text-base">Karla</span>
-                    </button>
-                    <button onclick="selectRole('oscar')" id="btnOscar" class="p-5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-center transition-all flex flex-col items-center gap-2">
-                        <i class="fa-solid fa-robot text-3xl text-indigo-400"></i>
-                        <span class="font-bold text-indigo-200 text-base">Oscar</span>
-                    </button>
-                </div>
+            <!-- SELECCIÓN DE PILOTO -->
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="selectPilot('karla')" id="btnKarla" class="p-4 rounded-2xl border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 text-center transition-all flex flex-col items-center gap-2 glow-button">
+                    <i class="fa-solid fa-user-astronaut text-3xl text-sky-400"></i>
+                    <span class="font-orbitron font-bold text-sky-200 text-sm">Karla</span>
+                </button>
+                <button onclick="selectPilot('oscar')" id="btnOscar" class="p-4 rounded-2xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-center transition-all flex flex-col items-center gap-2 glow-button">
+                    <i class="fa-solid fa-robot text-3xl text-indigo-400"></i>
+                    <span class="font-orbitron font-bold text-indigo-200 text-sm">Oscar</span>
+                </button>
             </div>
 
-            <!-- SELECTOR DE SKIN -->
-            <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 text-left space-y-3">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Elige tu Skin</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="selectSkin('skin1')" id="btnSkin1" class="p-3 rounded-xl border border-sky-500/40 bg-sky-500/20 text-center transition-all flex items-center justify-center gap-2 font-semibold text-sky-200 text-xs">
-                        <i class="fa-solid fa-shirt"></i> Estilo 1 (Clásico)
-                    </button>
-                    <button onclick="selectSkin('skin2')" id="btnSkin2" class="p-3 rounded-xl border border-slate-700 bg-slate-900 text-center transition-all flex items-center justify-center gap-2 font-semibold text-slate-300 text-xs">
-                        <i class="fa-solid fa-shirt"></i> Estilo 2 (Alternativo)
-                    </button>
-                </div>
+            <!-- CONTROLES -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-left text-xs text-slate-400 space-y-1">
+                <p class="font-semibold text-sky-300 font-orbitron text-[11px]"><i class="fa-solid fa-gamepad mr-1"></i> Comandos de Vuelo:</p>
+                <p>• Saltar obstáculo: <kbd class="bg-slate-800 px-1.5 py-0.5 rounded text-sky-300 font-bold">W</kbd> / <kbd class="bg-slate-800 px-1.5 py-0.5 rounded text-sky-300 font-bold">Espacio</kbd> (o Tocar Pantalla)</p>
             </div>
 
-            <!-- INSTRUCCIONES DE CONTROLES -->
-            <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-3 text-left space-y-1 text-xs text-slate-400">
-                <p class="font-semibold text-sky-300"><i class="fa-solid fa-keyboard mr-1"></i> Controles:</p>
-                <p>• Moverse: <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">A</kbd> / <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">D</kbd> (o Flechas Izq/Der)</p>
-                <p>• Saltar: <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">W</kbd> o <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">Espacio</kbd></p>
-                <p>• Agacharse: <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">S</kbd></p>
-            </div>
-
-            <button id="btnStartGame" onclick="joinGame()" disabled class="w-full py-4 rounded-2xl font-game font-bold text-slate-950 text-base uppercase tracking-wider bg-gradient-to-r from-sky-400 via-indigo-400 to-amber-300 opacity-50 cursor-not-allowed shadow-lg transition-all flex items-center justify-center gap-2">
-                <span>Comenzar Juego</span>
-                <i class="fa-solid fa-play"></i>
+            <button id="btnLaunch" onclick="launchGame()" disabled class="w-full py-4 rounded-2xl font-orbitron font-bold text-slate-950 text-sm tracking-widest uppercase bg-gradient-to-r from-sky-400 via-indigo-400 to-pink-400 opacity-40 cursor-not-allowed shadow-lg glow-button transition-all flex items-center justify-center gap-2">
+                <span>Iniciar Vuelo</span>
+                <i class="fa-solid fa-rocket"></i>
             </button>
         </div>
     </div>
 
-    <!-- UI SUPERIOR -->
+    <!-- UI SUPERIOR EN JUEGO -->
     <div class="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none z-20">
         <div class="bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-sky-500/30 shadow-lg pointer-events-auto flex items-center gap-3">
             <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow">
-                <i class="fa-solid fa-flag-checkered"></i>
+                <i class="fa-solid fa-star"></i>
             </div>
             <div>
-                <h1 class="text-xs sm:text-sm font-game font-bold text-sky-200" id="hudLevelTitle">Nivel 1: El Comienzo</h1>
-                <p class="text-[10px] text-slate-400" id="hudStatus">En línea</p>
+                <h1 class="text-xs sm:text-sm font-orbitron font-bold text-sky-200" id="hudScore">Distancia: 0m</h1>
+                <p class="text-[10px] text-slate-400" id="hudStatus">Conectando...</p>
             </div>
         </div>
 
         <div class="flex items-center gap-2 pointer-events-auto">
-            <button id="btnAudio" onclick="toggleAudio()" class="bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md p-3 rounded-2xl border border-sky-500/30 text-sky-300 shadow-lg flex items-center justify-center w-11 h-11">
+            <button onclick="toggleAudio()" class="bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md p-3 rounded-2xl border border-sky-500/30 text-sky-300 shadow-lg flex items-center justify-center w-11 h-11">
                 <i id="audioIcon" class="fa-solid fa-volume-xmark text-slate-400"></i>
             </button>
         </div>
     </div>
 
-    <!-- NOTIFICACIÓN / ESTADO EN VIVO EN PANTALLA -->
-    <div id="statusBanner" class="absolute top-20 left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-300 opacity-100 z-20">
-        <div id="statusBannerContent" class="bg-slate-900/90 backdrop-blur-md border border-sky-400/40 text-sky-200 px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-2 text-xs font-medium">
-            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-            <span id="statusBannerText">Esperando a que la otra persona se conecte a la sala... (puedes jugar mientras)</span>
-        </div>
-    </div>
-
-    <!-- CHAT FLOTANTE INFERIOR -->
-    <div id="chatBarContainer" class="absolute bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-slate-900/90 backdrop-blur-md border border-sky-500/30 rounded-2xl p-2 shadow-2xl pointer-events-auto z-30 flex items-center gap-2">
-        <input type="text" id="chatInput" placeholder="Escribe un mensaje en vivo..." maxlength="80" onkeydown="handleChatKey(event)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
-        <button onclick="sendChatMessage()" class="bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 text-white px-4 py-2 rounded-xl text-xs font-bold shadow transition-all">
+    <!-- CHAT EN VIVO -->
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-slate-900/90 backdrop-blur-md border border-sky-500/30 rounded-2xl p-2 shadow-2xl pointer-events-auto z-30 flex items-center gap-2">
+        <input type="text" id="chatInput" placeholder="Envía un mensaje estelar..." maxlength="80" onkeydown="handleChatKey(event)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+        <button onclick="sendChatMessage()" class="bg-gradient-to-r from-sky-500 to-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow">
             <i class="fa-solid fa-paper-plane"></i>
         </button>
     </div>
 
-    <!-- MODAL MOTIVACIONAL CON MENSAJES EXACTOS -->
-    <div id="levelModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-lg z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500">
-        <div class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-sky-500/40 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative text-center space-y-5">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-slate-950 text-3xl font-bold flex items-center justify-center mx-auto shadow-lg">
-                <i class="fa-solid fa-trophy"></i>
+    <!-- MODAL DE MENSAJE MOTIVACIONAL -->
+    <div id="motivationModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-lg z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500">
+        <div class="bg-slate-900 border border-sky-500/40 rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-amber-400 to-pink-500 flex items-center justify-center text-slate-950 text-2xl font-bold shadow">
+                <i class="fa-solid fa-heart"></i>
             </div>
-            <h2 id="modalTitle" class="text-2xl font-game font-bold text-sky-300">¡Nivel Completado!</h2>
-            
-            <div class="bg-slate-950/80 border border-sky-500/20 rounded-2xl p-5 text-slate-200 text-sm leading-relaxed text-left shadow-inner font-medium" id="modalMessage">
-            </div>
-
-            <button id="modalActionBtn" onclick="nextLevel()" class="w-full py-3.5 rounded-xl font-game font-bold text-slate-950 bg-gradient-to-r from-sky-400 via-indigo-300 to-amber-300 shadow-lg hover:brightness-110 transition-all">
-                Siguiente Nivel
+            <h2 id="modalTitle" class="text-xl font-orbitron font-bold text-sky-300">¡Mensaje Estelar!</h2>
+            <p id="modalText" class="text-slate-200 text-sm leading-relaxed font-medium bg-slate-950/60 p-4 rounded-xl border border-slate-800"></p>
+            <button onclick="closeModal()" class="w-full py-3 rounded-xl font-orbitron font-bold text-slate-950 bg-gradient-to-r from-sky-400 via-indigo-300 to-pink-300 shadow-lg">
+                Continuar Vuelo
             </button>
         </div>
     </div>
 
     <script>
         const socket = typeof io !== 'undefined' ? io() : { on: () => {}, emit: () => {} };
-        let selectedRole = null;
-        let selectedSkin = 'skin1';
-        let currentLevel = 1;
+        let selectedPilot = null;
+        let gameStarted = false;
+        let myId = null;
 
-        function selectRole(role) {
-            selectedRole = role;
-            document.getElementById('btnKarla').style.borderColor = role === 'karla' ? '#38bdf8' : 'rgba(56,189,248,0.2)';
-            document.getElementById('btnOscar').style.borderColor = role === 'oscar' ? '#818cf8' : 'rgba(129,140,248,0.2)';
-            checkStartReady();
-        }
-
-        function selectSkin(skin) {
-            selectedSkin = skin;
-            document.getElementById('btnSkin1').className = skin === 'skin1' ? 'p-3 rounded-xl border border-sky-500/40 bg-sky-500/20 text-center transition-all flex items-center justify-center gap-2 font-semibold text-sky-200 text-xs' : 'p-3 rounded-xl border border-slate-700 bg-slate-900 text-center transition-all flex items-center justify-center gap-2 font-semibold text-slate-300 text-xs';
-            document.getElementById('btnSkin2').className = skin === 'skin2' ? 'p-3 rounded-xl border border-indigo-500/40 bg-indigo-500/20 text-center transition-all flex items-center justify-center gap-2 font-semibold text-indigo-200 text-xs' : 'p-3 rounded-xl border border-slate-700 bg-slate-900 text-center transition-all flex items-center justify-center gap-2 font-semibold text-slate-300 text-xs';
-            checkStartReady();
-        }
-
-        function checkStartReady() {
-            if (selectedRole) {
-                const btn = document.getElementById('btnStartGame');
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed', 'glow-btn');
-                btn.classList.add('glow-btn');
-            }
+        function selectPilot(pilot) {
+            selectedPilot = pilot;
+            document.getElementById('btnKarla').style.borderColor = pilot === 'karla' ? '#38bdf8' : 'rgba(56,189,248,0.2)';
+            document.getElementById('btnOscar').style.borderColor = pilot === 'oscar' ? '#818cf8' : 'rgba(129,140,248,0.2)';
+            
+            const btn = document.getElementById('btnLaunch');
+            btn.disabled = false;
+            btn.classList.remove('opacity-40', 'cursor-not-allowed');
         }
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const startCanvas = document.getElementById('startParticleCanvas');
-        const startCtx = startCanvas ? startCanvas.getContext('2d') : null;
+        const portalCanvas = document.getElementById('portalCanvas');
+        const portalCtx = portalCanvas ? portalCanvas.getContext('2d') : null;
 
-        let width, height, gameStarted = false;
-
-        function resizeCanvas() {
+        let width, height;
+        function resize() {
             width = window.innerWidth;
             height = window.innerHeight;
             canvas.width = width;
             canvas.height = height;
-            if (startCanvas) { startCanvas.width = width; startCanvas.height = height; }
+            if (portalCanvas) { portalCanvas.width = width; portalCanvas.height = height; }
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        window.addEventListener('resize', resize);
+        resize();
 
+        // Fondo animado de la pantalla de inicio
+        let portalAngle = 0;
+        function drawPortalBackground() {
+            if (!portalCtx || gameStarted) return;
+            portalCtx.clearRect(0, 0, width, height);
+            portalAngle += 0.02;
+
+            portalCtx.save();
+            portalCtx.translate(width / 2, height / 2);
+            for (let i = 0; i < 5; i++) {
+                portalCtx.strokeStyle = i % 2 === 0 ? 'rgba(56, 189, 248, 0.15)' : 'rgba(236, 72, 153, 0.15)';
+                portalCtx.lineWidth = 2;
+                portalCtx.beginPath();
+                portalCtx.arc(0, 0, 80 + i * 50, portalAngle, portalAngle + Math.PI * 1.5);
+                portalCtx.stroke();
+            }
+            portalCtx.restore();
+            requestAnimationFrame(drawPortalBackground);
+        }
+        drawPortalBackground();
+
+        // Variables del juego de carrera estelar
         let players = {};
-        let myId = null;
-
-        const player = {
-            x: 100,
-            y: -200, // Empiezan cayendo desde arriba
-            vx: 0,
-            vy: 2,
-            speed: 5.5,
-            jumpPower: -13,
-            gravity: 0.6,
+        const localPlayer = {
+            x: 150,
+            y: 0,
+            vy: 0,
+            gravity: 0.55,
+            jumpPower: -12,
             isGrounded: false,
-            isCrouched: false,
-            direction: 1,
-            isWalking: false,
-            animFrame: 0,
-            animTimer: 0,
-            width: 32,
+            width: 36,
             height: 64,
+            distance: 0,
             chatMessage: "",
             chatTimer: 0
         };
 
-        const levels = {
-            1: {
-                title: "Nivel 1: El Comienzo",
-                worldWidth: 2600,
-                platforms: [
-                    { x: 0, y: 120, w: 500, h: 120 },
-                    { x: 580, y: 180, w: 200, h: 40 },
-                    { x: 860, y: 240, w: 180, h: 40 },
-                    { x: 1120, y: 180, w: 250, h: 40 },
-                    { x: 1450, y: 220, w: 200, h: 40 },
-                    { x: 1720, y: 160, w: 220, h: 40 },
-                    { x: 2020, y: 120, w: 500, h: 120 }
-                ],
-                goal: { x: 2350, y: 120, w: 50, h: 80 }
-            },
-            2: {
-                title: "Nivel 2: Desafío Elevado",
-                worldWidth: 2800,
-                platforms: [
-                    { x: 0, y: 120, w: 400, h: 120 },
-                    { x: 480, y: 190, w: 140, h: 30 },
-                    { x: 690, y: 260, w: 140, h: 30 },
-                    { x: 910, y: 320, w: 160, h: 30 },
-                    { x: 1150, y: 240, w: 130, h: 30 },
-                    { x: 1360, y: 180, w: 140, h: 30 },
-                    { x: 1580, y: 270, w: 150, h: 30 },
-                    { x: 1810, y: 340, w: 160, h: 30 },
-                    { x: 2050, y: 250, w: 150, h: 30 },
-                    { x: 2280, y: 140, w: 500, h: 140 }
-                ],
-                goal: { x: 2600, y: 140, w: 50, h: 80 }
-            },
-            3: {
-                title: "Nivel 3: La Gran Cima",
-                worldWidth: 3200,
-                platforms: [
-                    { x: 0, y: 120, w: 350, h: 120 },
-                    { x: 430, y: 180, w: 110, h: 30 },
-                    { x: 610, y: 250, w: 100, h: 30 },
-                    { x: 780, y: 330, w: 110, h: 30 },
-                    { x: 970, y: 400, w: 120, h: 30 },
-                    { x: 1170, y: 320, w: 100, h: 30 },
-                    { x: 1350, y: 230, w: 110, h: 30 },
-                    { x: 1540, y: 310, w: 100, h: 30 },
-                    { x: 1720, y: 390, w: 110, h: 30 },
-                    { x: 1910, y: 470, w: 120, h: 30 },
-                    { x: 2120, y: 380, w: 100, h: 30 },
-                    { x: 2300, y: 280, w: 110, h: 30 },
-                    { x: 2490, y: 180, w: 120, h: 30 },
-                    { x: 2700, y: 150, w: 500, h: 150 }
-                ],
-                goal: { x: 3000, y: 150, w: 50, h: 80 }
-            }
-        };
+        const groundLevel = 120;
+        let obstacles = [];
+        let obstacleTimer = 0;
+        let score = 0;
 
-        const levelMessages = {
-            1: {
-                title: "¡Nivel 1 Completado! 🌟",
-                message: "Se te quiere mucho Karla. Recuerda que vales demasiado y que eres única. De verdad, no te dejes tumbar por nada ni por nadie porque vales un montón.",
-                btnText: "Ir al Nivel 2"
-            },
-            2: {
-                title: "¡Nivel 2 Superado! 🤝",
-                message: "Recuerda que tienes todo mi apoyo para lo que necesites, de verdad. En lo que te pueda ayudar o lo que ocupe escuchar, aquí ando contigo cuando ocupes algo.",
-                btnText: "Ir al Nivel Final"
-            },
-            3: {
-                title: "¡Juego Completado! 🎉",
-                message: "Sé que no han sido días fáciles, pero recuerda que tienes a mucha gente que te quiere y te apoya de verdad. Échale muchas ganas, tómate las cosas con calma y acuérdate siempre de lo mucho que vales.",
-                btnText: "Volver a Jugar"
-            }
-        };
-
-        const camera = { x: 0, smoothness: 0.08 };
-        const keys = { left: false, right: false, jump: false, crouch: false };
+        const motivationalQuotes = [
+            "Se te quiere mucho Karla. Recuerda que vales demasiado y que eres única.",
+            "No te dejes tumbar por nada ni por nadie, ¡vales un montón!",
+            "Tienes todo mi apoyo para lo que necesites, siempre estoy contigo.",
+            "Tómate las cosas con calma y acuérdate siempre de lo mucho que vales."
+        ];
 
         window.addEventListener('keydown', (e) => {
             if (!gameStarted) return;
             if (document.activeElement.id === 'chatInput') return;
-
-            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = true;
-            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = true;
-            if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w' || e.key === ' ') {
-                if (player.isGrounded && !player.isCrouched) {
-                    player.vy = player.jumpPower;
-                    player.isGrounded = false;
-                }
-            }
-            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
-                keys.crouch = true;
-                player.isCrouched = true;
+            if (e.key === ' ' || e.key.toLowerCase() === 'w' || e.key === 'ArrowUp') {
+                jumpAction();
             }
         });
 
-        window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = false;
-            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = false;
-            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
-                keys.crouch = false;
-                player.isCrouched = false;
+        window.addEventListener('click', () => {
+            if (gameStarted && document.activeElement.id !== 'chatInput') {
+                jumpAction();
             }
         });
 
-        function joinGame() {
-            if (!selectedRole) return;
+        function jumpAction() {
+            if (localPlayer.isGrounded) {
+                localPlayer.vy = localPlayer.jumpPower;
+                localPlayer.isGrounded = false;
+            }
+        }
+
+        function launchGame() {
+            if (!selectedPilot) return;
             gameStarted = true;
             myId = socket.id;
             document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
 
-            player.x = 100;
-            player.y = -200; // Empiezan cayendo desde arriba en cada partida
-            player.vy = 2;
-
-            socket.emit('joinGame', { 
-                name: selectedRole === 'karla' ? 'Karla' : 'Oscar', 
-                role: selectedRole, 
-                skin: selectedSkin 
+            socket.emit('joinGame', {
+                name: selectedPilot === 'karla' ? 'Karla' : 'Oscar',
+                role: selectedPilot
             });
 
             initAudio();
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             isAudioPlaying = true;
             document.getElementById('audioIcon').className = 'fa-solid fa-volume-high text-sky-400 animate-pulse';
             startMelody();
@@ -370,18 +269,16 @@
         socket.on('currentPlayers', (serverPlayers) => {
             players = serverPlayers;
             if (!myId) myId = socket.id;
-            updateStatusBanner();
+            updateStatus();
         });
 
-        socket.on('playerMoved', (pData) => { 
-            if (players[pData.id]) {
-                players[pData.id] = pData; 
-            }
+        socket.on('playerMoved', (pData) => {
+            if (players[pData.id]) players[pData.id] = pData;
         });
 
-        socket.on('removePlayer', (id) => { 
-            delete players[id]; 
-            updateStatusBanner(); 
+        socket.on('removePlayer', (id) => {
+            delete players[id];
+            updateStatus();
         });
 
         socket.on('playerChat', (data) => {
@@ -391,20 +288,15 @@
             }
         });
 
-        function updateStatusBanner() {
+        function updateStatus() {
             const count = Object.keys(players).length;
-            const textEl = document.getElementById('statusBannerText');
-            const hudStatus = document.getElementById('hudStatus');
-
+            const statusEl = document.getElementById('hudStatus');
             if (count >= 2) {
-                textEl.innerText = "¡Ambos conectados! Jugando juntos en tiempo real ✨";
-                hudStatus.innerText = "Multijugador (2/2)";
-                hudStatus.className = "text-[10px] text-emerald-400 font-bold";
+                statusEl.innerText = "Modo Dúo Activo ✨";
+                statusEl.className = "text-[10px] text-emerald-400 font-bold";
             } else {
-                const other = selectedRole === 'karla' ? 'Oscar' : 'Karla';
-                textEl.innerText = `Esperando a que ${other} se conecte a la sala... (puedes jugar mientras)`;
-                hudStatus.innerText = "Modo Individual (1/2)";
-                hudStatus.className = "text-[10px] text-amber-400";
+                statusEl.innerText = "Modo Solo (Esperando compañero)";
+                statusEl.className = "text-[10px] text-amber-400";
             }
         }
 
@@ -413,268 +305,161 @@
             const msg = input.value.trim();
             if (!msg) return;
 
-            player.chatMessage = msg;
-            player.chatTimer = 300;
-            if (myId && players[myId]) {
-                players[myId].chatMessage = msg;
-                players[myId].chatTimer = 300;
-            }
+            localPlayer.chatMessage = msg;
+            localPlayer.chatTimer = 300;
             socket.emit('chatMessage', msg);
             input.value = "";
         }
-
         function handleChatKey(e) { if (e.key === 'Enter') sendChatMessage(); }
 
-        const stars = Array.from({ length: 30 }, () => ({
+        // Estrellas de fondo dinámicas
+        const stars = Array.from({ length: 40 }, () => ({
             x: Math.random() * width,
             y: Math.random() * height,
-            size: Math.random() * 3 + 1,
-            speedY: Math.random() * 0.3 + 0.1,
-            opacity: Math.random() * 0.6 + 0.2
+            size: Math.random() * 2.5 + 1,
+            speed: Math.random() * 2 + 1
         }));
 
-        function drawStars(context) {
-            context.save();
-            stars.forEach(s => {
-                s.y -= s.speedY;
-                if (s.y < -10) { s.y = height + 10; s.x = Math.random() * width; }
-                context.fillStyle = `rgba(56, 189, 248, ${s.opacity})`;
-                context.beginPath(); context.arc(s.x, s.y, s.size, 0, Math.PI * 2); context.fill();
-            });
-            context.restore();
-        }
-
-        function startParticleLoop() {
-            if (!gameStarted && startCtx) {
-                startCtx.clearRect(0, 0, width, height);
-                drawStars(startCtx);
-                requestAnimationFrame(startParticleLoop);
-            }
-        }
-        startParticleLoop();
-
-        function update() {
+        function updateGame() {
             if (!gameStarted) return;
 
-            player.vx = 0;
-            if (!player.isCrouched) {
-                if (keys.left) { player.vx = -player.speed; player.direction = -1; player.isWalking = true; }
-                else if (keys.right) { player.vx = player.speed; player.direction = 1; player.isWalking = true; }
-                else { player.isWalking = false; }
-            } else {
-                player.isWalking = false;
+            localPlayer.vy += localPlayer.gravity;
+            localPlayer.y += localPlayer.vy;
+
+            const floorY = height - groundLevel;
+            localPlayer.isGrounded = false;
+
+            if (localPlayer.y >= floorY - localPlayer.height) {
+                localPlayer.y = floorY - localPlayer.height;
+                localPlayer.vy = 0;
+                localPlayer.isGrounded = true;
             }
 
-            player.x += player.vx;
-            player.vy += player.gravity;
-            player.y += player.vy;
+            score += 0.1;
+            document.getElementById('hudScore').innerText = `Distancia: ${Math.floor(score)}m`;
 
-            const lvl = levels[currentLevel];
-            player.isGrounded = false;
-            const activeHeight = player.isCrouched ? 40 : player.height;
-
-            // Física de colisión 100% sólida basada en la estructura limpia de referencia
-            lvl.platforms.forEach(plat => {
-                const platTopY = height - plat.y - plat.h;
-                if (
-                    player.x + player.width / 2 > plat.x &&
-                    player.x - player.width / 2 < plat.x + plat.w &&
-                    player.y + activeHeight >= platTopY &&
-                    player.y + activeHeight - player.vy <= platTopY + 22 &&
-                    player.vy >= 0
-                ) {
-                    player.y = platTopY - activeHeight;
-                    player.vy = 0;
-                    player.isGrounded = true;
-                }
-            });
-
-            // Si cae al vacío, reaparece cayendo desde arriba
-            if (player.y > height + 150) {
-                player.x = 100;
-                player.y = -150;
-                player.vy = 2;
-            }
-
-            if (player.x < 50) player.x = 50;
-            if (player.x > lvl.worldWidth - 50) player.x = lvl.worldWidth - 50;
-
-            if (player.isWalking) {
-                player.animTimer++;
-                if (player.animTimer % 8 === 0) player.animFrame = (player.animFrame + 1) % 4;
-            } else { player.animFrame = 0; }
-
-            if (player.chatTimer > 0) player.chatTimer--;
-
-            if (myId && players[myId]) {
-                players[myId].x = player.x;
-                players[myId].y = player.y;
-                players[myId].direction = player.direction;
-                players[myId].isWalking = player.isWalking;
-                players[myId].isCrouched = player.isCrouched;
-                players[myId].chatMessage = player.chatMessage;
-                players[myId].chatTimer = player.chatTimer;
-
-                socket.emit('playerMovement', {
-                    x: player.x,
-                    y: player.y,
-                    direction: player.direction,
-                    isWalking: player.isWalking,
-                    isCrouched: player.isCrouched
+            // Generar obstáculos estelares
+            obstacleTimer++;
+            if (obstacleTimer > 110) {
+                obstacleTimer = 0;
+                obstacles.push({
+                    x: width + 50,
+                    y: floorY - 45,
+                    w: 35,
+                    h: 45
                 });
             }
 
-            camera.x += ((player.x - width / 3) - camera.x) * camera.smoothness;
-            if (camera.x < 0) camera.x = 0;
-            if (camera.x > lvl.worldWidth - width) camera.x = lvl.worldWidth - width;
+            // Mover y verificar colisiones con obstáculos
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= 6;
 
-            const goal = lvl.goal;
-            const goalTopY = height - goal.y - goal.h;
-            if (
-                Math.abs(player.x - (goal.x + goal.w / 2)) < 40 &&
-                Math.abs((player.y + activeHeight / 2) - (goalTopY + goal.h / 2)) < 60
-            ) {
-                triggerLevelComplete();
-            }
-        }
-
-        function triggerLevelComplete() {
-            if (document.getElementById('levelModal').classList.contains('opacity-100')) return;
-
-            const info = levelMessages[currentLevel];
-            document.getElementById('modalTitle').innerText = info.title;
-            document.getElementById('modalMessage').innerText = info.message;
-            document.getElementById('modalActionBtn').innerText = info.btnText;
-
-            document.getElementById('levelModal').classList.remove('opacity-0', 'pointer-events-none');
-            document.getElementById('levelModal').classList.add('opacity-100');
-        }
-
-        function nextLevel() {
-            document.getElementById('levelModal').classList.remove('opacity-100');
-            document.getElementById('levelModal').classList.add('opacity-0', 'pointer-events-none');
-
-            if (currentLevel < 3) {
-                currentLevel++;
-            } else {
-                currentLevel = 1;
-            }
-
-            player.x = 100;
-            player.y = -150;
-            player.vy = 2;
-            document.getElementById('hudLevelTitle').innerText = levels[currentLevel].title;
-        }
-
-        function render() {
-            ctx.clearRect(0, 0, width, height);
-
-            const lvl = levels[currentLevel];
-
-            const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
-            bgGrad.addColorStop(0, '#0f172a');
-            bgGrad.addColorStop(1, '#020617');
-            ctx.fillStyle = bgGrad;
-            ctx.fillRect(0, 0, width, height);
-
-            ctx.save();
-            ctx.translate(-camera.x, 0);
-
-            // Renderizado de plataformas sólidas
-            lvl.platforms.forEach(plat => {
-                const platTopY = height - plat.y - plat.h;
-                ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                ctx.fillRect(plat.x + 4, platTopY + 4, plat.w, plat.h);
-
-                ctx.fillStyle = '#1e293b';
-                ctx.fillRect(plat.x, platTopY, plat.w, plat.h);
-
-                ctx.fillStyle = '#38bdf8';
-                ctx.fillRect(plat.x, platTopY, plat.w, 4);
-            });
-
-            // Renderizado de la meta
-            const goal = lvl.goal;
-            const goalTopY = height - goal.y - goal.h;
-            
-            const portalGrad = ctx.createRadialGradient(
-                goal.x + goal.w / 2, goalTopY + goal.h / 2, 5,
-                goal.x + goal.w / 2, goalTopY + goal.h / 2, 45
-            );
-            portalGrad.addColorStop(0, '#fbbf24');
-            portalGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
-            ctx.fillStyle = portalGrad;
-            ctx.beginPath();
-            ctx.arc(goal.x + goal.w / 2, goalTopY + goal.h / 2, 45, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.strokeStyle = '#fbbf24';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(goal.x, goalTopY, goal.w, goal.h);
-            ctx.fillStyle = '#fef08a';
-            ctx.font = 'bold 20px Fredoka, cursive';
-            ctx.textAlign = 'center';
-            ctx.fillText('META', goal.x + goal.w / 2, goalTopY + goal.h / 2 + 7);
-
-            // Renderizado alineado de los avatares (basado en el archivo limpio de referencia)
-            Object.values(players).forEach(p => {
-                ctx.save();
-                const curH = p.isCrouched ? 40 : 64;
-                ctx.translate(p.x, p.y + curH);
-
-                ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                ctx.beginPath(); ctx.ellipse(0, 0, 14, 4, 0, 0, Math.PI * 2); ctx.fill();
-
-                if (p.direction === -1) ctx.scale(-1, 1);
-
-                const skin = p.skin || 'skin1';
-
-                if (skin === 'skin2') {
-                    ctx.fillStyle = '#ec4899';
-                    ctx.beginPath();
-                    ctx.roundRect(-12, -curH + 18, 24, curH - 20, 6);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#fed7aa';
-                    ctx.beginPath();
-                    ctx.arc(0, -curH + 12, 12, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#f43f5e';
-                    ctx.beginPath();
-                    ctx.arc(0, -curH + 9, 13, Math.PI, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    ctx.fillStyle = p.role === 'karla' ? '#0284c7' : '#4f46e5';
-                    ctx.beginPath();
-                    ctx.roundRect(-12, -curH + 18, 24, curH - 20, 6);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#fed7aa';
-                    ctx.beginPath();
-                    ctx.arc(0, -curH + 12, 12, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = p.role === 'karla' ? '#7c2d12' : '#1e1b4b';
-                    ctx.beginPath();
-                    ctx.arc(0, -curH + 9, 13, Math.PI, Math.PI * 2);
-                    ctx.fill();
+                // Colisión segura con rectángulo
+                if (
+                    localPlayer.x < obstacles[i].x + obstacles[i].w &&
+                    localPlayer.x + localPlayer.width > obstacles[i].x &&
+                    localPlayer.y < obstacles[i].y + obstacles[i].h &&
+                    localPlayer.y + localPlayer.height > obstacles[i].y
+                ) {
+                    // Si choca, muestra un mensaje motivacional aleatorio y lo salta
+                    triggerMotivationModal();
+                    obstacles.splice(i, 1);
+                    continue;
                 }
 
-                ctx.fillStyle = '#0f172a';
+                if (obstacles[i].x < -50) obstacles.splice(i, 1);
+            }
+
+            if (localPlayer.chatTimer > 0) localPlayer.chatTimer--;
+
+            if (myId && players[myId]) {
+                players[myId].x = localPlayer.x;
+                players[myId].y = localPlayer.y;
+                players[myId].chatMessage = localPlayer.chatMessage;
+                players[myId].chatTimer = localPlayer.chatTimer;
+
+                socket.emit('playerMovement', {
+                    x: localPlayer.x,
+                    y: localPlayer.y,
+                    chatMessage: localPlayer.chatMessage
+                });
+            }
+        }
+
+        function triggerMotivationModal() {
+            const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+            document.getElementById('modalText').innerText = randomQuote;
+            document.getElementById('motivationModal').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('motivationModal').classList.add('opacity-100');
+        }
+
+        function closeModal() {
+            document.getElementById('motivationModal').classList.remove('opacity-100');
+            document.getElementById('motivationModal').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function renderGame() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Fondo estelar en movimiento
+            ctx.fillStyle = '#ffffff';
+            stars.forEach(s => {
+                s.x -= s.speed;
+                if (s.x < 0) s.x = width;
+                ctx.globalAlpha = Math.random() * 0.5 + 0.3;
+                ctx.fillRect(s.x, s.y, s.size, s.size);
+            });
+            ctx.globalAlpha = 1.0;
+
+            const floorY = height - groundLevel;
+
+            // Suelo futurista
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, floorY, width, groundLevel);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(0, floorY, width, 4);
+
+            // Obstáculos
+            obstacles.forEach(obs => {
+                ctx.fillStyle = '#f43f5e';
                 ctx.beginPath();
-                ctx.arc(4, -curH + 11, 2, 0, Math.PI * 2);
+                ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 8);
+                ctx.fill();
+                ctx.strokeStyle = '#fda4af';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+
+            // Dibujar jugadores
+            Object.values(players).forEach(p => {
+                ctx.save();
+                ctx.translate(p.x, floorY - localPlayer.height + (p.y || 0));
+
+                // Sombra
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                ctx.beginPath(); ctx.ellipse(localPlayer.width / 2, localPlayer.height + 4, 14, 4, 0, 0, Math.PI * 2); ctx.fill();
+
+                // Cuerpo del personaje
+                ctx.fillStyle = p.role === 'karlet' || p.role === 'karla' ? '#0284c7' : '#6366f1';
+                ctx.beginPath();
+                ctx.roundRect(0, 16, localPlayer.width, 48, 8);
+                ctx.fill();
+
+                // Cabeza
+                ctx.fillStyle = '#fed7aa';
+                ctx.beginPath();
+                ctx.arc(localPlayer.width / 2, 12, 12, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.restore();
 
-                // Nombre y burbuja de chat sincronizados
+                // Nombre y Chat
                 ctx.save();
-                ctx.translate(p.x, p.y);
+                ctx.translate(p.x, floorY - localPlayer.height + (p.y || 0));
                 ctx.fillStyle = '#e2e8f0';
-                ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
+                ctx.font = 'bold 11px Orbitron, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText(p.name, 0, -10);
+                ctx.fillText(p.name, localPlayer.width / 2, -10);
 
                 if (p.chatMessage && p.chatTimer > 0) {
                     ctx.font = '12px Plus Jakarta Sans, sans-serif';
@@ -686,42 +471,39 @@
                     ctx.strokeStyle = '#38bdf8';
                     ctx.lineWidth = 1;
                     ctx.beginPath();
-                    ctx.roundRect(-bw / 2, -35 - bh, bw, bh, 6);
+                    ctx.roundRect(localPlayer.width / 2 - bw / 2, -35 - bh, bw, bh, 6);
                     ctx.fill();
                     ctx.stroke();
 
                     ctx.fillStyle = '#38bdf8';
-                    ctx.fillText(p.chatMessage, 0, -35 - 8);
+                    ctx.textAlign = 'center';
+                    ctx.fillText(p.chatMessage, localPlayer.width / 2, -35 - 8);
                 }
-
                 ctx.restore();
             });
-
-            ctx.restore();
-            drawStars(ctx);
         }
 
         function gameLoop() {
-            update();
-            render();
+            updateGame();
+            renderGame();
             requestAnimationFrame(gameLoop);
         }
 
         let audioCtx, isAudioPlaying = false, melodyInterval;
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        const notes = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88];
+        const notes = [261.63, 329.63, 392.00, 523.25];
         function playNote(freq) {
             if (!audioCtx || !isAudioPlaying) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.0);
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 1.2);
+            osc.start(); osc.stop(audioCtx.currentTime + 1.0);
         }
         function startMelody() {
             let idx = 0;
-            melodyInterval = setInterval(() => { if (isAudioPlaying) { playNote(notes[idx]); idx = (idx+1)%notes.length; } }, 600);
+            melodyInterval = setInterval(() => { if (isAudioPlaying) { playNote(notes[idx]); idx = (idx+1)%notes.length; } }, 700);
         }
         function toggleAudio() {
             initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
