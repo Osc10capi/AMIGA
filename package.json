@@ -1,7 +1,7 @@
 {
   "name": "amiga",
   "version": "1.0.0",
-  "description": "Juego Parkour Motivacional en línea para Karla y Oscar",
+  "description": "Aventura Parkour Motivacional",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
