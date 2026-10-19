@@ -75,7 +75,7 @@
                 <h1 class="text-3xl sm:text-4xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-200 to-pink-400">
                     PARA KARLA ✨
                 </h1>
-                <p class="text-xs text-slate-300">Prepárate para este reto de parkour elevado</p>
+                <p class="text-xs text-slate-300">Prepárate para este reto de parkour accesible y divertido</p>
             </div>
 
             <button onclick="startGame()" class="w-full py-4 rounded-2xl font-orbitron font-bold text-slate-950 text-xs tracking-widest uppercase bg-gradient-to-r from-sky-400 via-indigo-300 to-pink-400 shadow-lg glow-hover transition-all">
@@ -122,7 +122,6 @@
             
             <h2 id="modalTitle" class="text-lg font-orbitron font-bold text-amber-200">Carta Especial</h2>
             
-            <!-- TÍTULO EXIGIDO ARRIBA DE LA FOTO -->
             <div class="bg-amber-500/10 border border-amber-500/30 py-1.5 px-3 rounded-lg">
                 <span class="text-xs font-orbitron font-bold tracking-widest text-amber-300 uppercase">FOTO RANDOM QUE ENCONTRÉ</span>
             </div>
@@ -163,7 +162,7 @@
             </div>
             <div>
                 <h1 class="text-xs sm:text-sm font-orbitron font-bold text-sky-200">Cartas Descubiertas: <span id="cardsCount">0</span>/3</h1>
-                <p class="text-[10px] text-slate-400" id="hudStatus">¡Cartas ubicadas en el 3er escalón (muy altas)!</p>
+                <p class="text-[10px] text-slate-400" id="hudStatus">¡Escalones a una altura accesible y divertida!</p>
             </div>
         </div>
 
@@ -227,7 +226,7 @@
             y: 0,
             vy: 0,
             gravity: 0.65,
-            jumpPower: -13.5,
+            jumpPower: -13,
             speed: 5.5,
             isGrounded: false,
             isCrouched: false,
@@ -238,21 +237,21 @@
             chatTimer: 0
         };
 
-        // PLATAFORMAS DE PARKOUR EXTREMADAMENTE ALTAS (3ER ESCALÓN / MUY ALTAS)
+        // PLATAFORMAS AJUSTADAS UN POCO MÁS ABAJO PARA QUE SEAN FÁCILES DE ALCANZAR
         const longLevel = {
             worldWidth: 3800,
             platforms: [
                 { x: 0, y: 120, w: 380, h: 120 },
-                { x: 470, y: 280, w: 120, h: 30 },
-                { x: 680, y: 440, w: 110, h: 30 },
-                { x: 910, y: 310, w: 130, h: 30 },
-                { x: 1160, y: 450, w: 110, h: 30 },
-                { x: 1390, y: 560, w: 120, h: 30 },
-                { x: 1630, y: 400, w: 120, h: 30 },
-                { x: 1870, y: 270, w: 130, h: 30 },
-                { x: 2120, y: 420, w: 110, h: 30 },
-                { x: 2350, y: 550, w: 120, h: 30 },
-                { x: 2590, y: 380, w: 120, h: 30 },
+                { x: 470, y: 210, w: 130, h: 30 },
+                { x: 680, y: 320, w: 120, h: 30 },
+                { x: 910, y: 230, w: 140, h: 30 },
+                { x: 1160, y: 340, w: 120, h: 30 },
+                { x: 1390, y: 430, w: 130, h: 30 },
+                { x: 1630, y: 310, w: 130, h: 30 },
+                { x: 1870, y: 210, w: 140, h: 30 },
+                { x: 2120, y: 320, w: 120, h: 30 },
+                { x: 2350, y: 410, w: 130, h: 30 },
+                { x: 2590, y: 290, w: 130, h: 30 },
                 { x: 2840, y: 130, w: 850, h: 120 }
             ]
         };
@@ -261,14 +260,14 @@
         const camera = { x: 0, smoothness: 0.08 };
         const keys = { left: false, right: false };
 
-        // 3 CARTAS COLOCADAS EXACTAMENTE EN EL 3ER ESCALÓN / PLATAFORMAS MUY ALTAS
+        // 3 CARTAS CON LAS FOTOS RENOMBRADAS COMO FOTO1, FOTO2 Y FOTO3
         const letters = [
             { 
                 id: 1, 
                 x: 970, 
                 title: "Carta 1: Primer Recuerdo", 
                 message: "Se te quiere mucho Karla. Recuerda que vales demasiado y que eres única en este mundo. Nunca lo olvides.", 
-                photo: "WhatsApp Image 2026-10-18 at 10.50.09 PM.jpeg", 
+                photo: "foto1.jpg", 
                 opened: false 
             },
             { 
@@ -276,7 +275,7 @@
                 x: 2180, 
                 title: "Carta 2: Segundo Recuerdo", 
                 message: "No te dejes tumbar por nada ni por nadie. Tienes todo mi apoyo para lo que necesites, siempre estoy contigo.", 
-                photo: "WhatsApp Image 2026-10-18 at 10.50.09 PM (1)_3.jpeg", 
+                photo: "foto2.jpg", 
                 opened: false 
             },
             { 
@@ -284,7 +283,7 @@
                 x: 3350, 
                 title: "Carta 3: Meta Final", 
                 message: "Sé que a veces hay días difíciles, pero tómate las cosas con calma y acuérdate siempre de lo mucho que vales y de lo lejos que vas a llegar.", 
-                photo: "WhatsApp Image 2026-10-18 at 11.08.12 PM_3.jpeg", 
+                photo: "foto3.jpg", 
                 opened: false 
             }
         ];
