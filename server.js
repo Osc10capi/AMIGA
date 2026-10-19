@@ -17,10 +17,15 @@ io.on('connection', (socket) => {
         players[socket.id] = {
             id: socket.id,
             name: playerData.name,
-            role: playerData.role, // 'oscar' o 'evelin'
-            x: playerData.role === 'oscar' ? 200 : 300,
+            role: playerData.role,
+            skin: playerData.skin || 'skin1',
+            x: 100,
+            y: 0,
             direction: 1,
-            isWalking: false
+            isWalking: false,
+            isCrouched: false,
+            chatMessage: "",
+            chatTimer: 0
         };
         io.emit('currentPlayers', players);
     });
@@ -28,9 +33,19 @@ io.on('connection', (socket) => {
     socket.on('playerMovement', (movementData) => {
         if (players[socket.id]) {
             players[socket.id].x = movementData.x;
+            players[socket.id].y = movementData.y;
             players[socket.id].direction = movementData.direction;
             players[socket.id].isWalking = movementData.isWalking;
+            players[socket.id].isCrouched = movementData.isCrouched;
             socket.broadcast.emit('playerMoved', players[socket.id]);
+        }
+    });
+
+    socket.on('chatMessage', (msg) => {
+        if (players[socket.id]) {
+            players[socket.id].chatMessage = msg;
+            players[socket.id].chatTimer = 300;
+            io.emit('playerChat', { id: socket.id, message: msg });
         }
     });
 
