@@ -3,6 +3,810 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aventura Parkour Motivacional | Karla & Oscar</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            overflow: hidden;
+            background-color: #0d1117;
+            color: #f0f6fc;
+        }
+
+        .font-game { font-family: 'Fredoka', cursive; }
+
+        #gameCanvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            background: #0d1117;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.4); border-radius: 10px; }
+
+        .glow-btn {
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); opacity: 0.95; }
+            50% { transform: scale(1.03); opacity: 1; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2.5s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="relative w-screen h-screen overflow-hidden bg-slate-950 text-slate-100 font-sans">
+
+    <!-- CANVAS DEL JUEGO -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- PANTALLA DE INICIO: PASO 1 (SELECCIÓN DE DISPOSITIVO) -->
+    <div id="deviceScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl transition-all duration-700">
+        <div class="relative z-10 max-w-md w-full bg-slate-900/90 border border-sky-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-500 text-white text-3xl shadow-lg animate-pulse-subtle">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+            </div>
+            <div class="space-y-2">
+                <span class="text-xs font-bold tracking-widest text-sky-400 uppercase">Configuración Inicial</span>
+                <h1 class="text-2xl sm:text-3xl font-game font-bold text-slate-100">¿En qué dispositivo juegas?</h1>
+                <p class="text-xs text-slate-400">Adaptaremos los controles perfectamente para ti</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="setDevice('pc')" class="p-5 rounded-2xl border border-sky-500/30 bg-slate-950 hover:bg-sky-500/10 text-center transition-all flex flex-col items-center gap-3 group">
+                    <i class="fa-solid fa-desktop text-3xl text-sky-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="font-bold text-sky-200 text-sm">Computadora (PC)</span>
+                </button>
+                <button onclick="setDevice('mobile')" class="p-5 rounded-2xl border border-indigo-500/30 bg-slate-950 hover:bg-indigo-500/10 text-center transition-all flex flex-col items-center gap-3 group">
+                    <i class="fa-solid fa-mobile-screen text-3xl text-indigo-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="font-bold text-indigo-200 text-sm">Celular / Tablet</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE INICIO: PASO 2 (SELECCIÓN DE PERSONAJE Y SKIN) -->
+    <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl transition-all duration-700 opacity-0 pointer-events-none">
+        <canvas id="startParticleCanvas" class="absolute inset-0 pointer-events-none"></canvas>
+
+        <div class="relative z-10 max-w-xl w-full bg-slate-900/90 border border-sky-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6 max-h-[92vh] overflow-y-auto">
+            
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-500 text-white text-3xl shadow-lg animate-pulse-subtle">
+                <i class="fa-solid fa-gamepad"></i>
+            </div>
+
+            <div class="space-y-2">
+                <span class="text-xs font-bold tracking-widest text-sky-400 uppercase">Aventura de Parkour y Motivación</span>
+                <h1 class="text-3xl sm:text-4xl font-game font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-amber-300">
+                    ¡Ánimo Karla! 🌟
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-300">Elige tu personaje y personaliza tu skin</p>
+            </div>
+
+            <!-- SELECCIÓN DE PERSONAJE -->
+            <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 text-left space-y-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Selecciona tu personaje</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="selectRole('karla')" id="btnKarla" class="p-4 rounded-xl border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 text-center transition-all flex flex-col items-center gap-2">
+                        <i class="fa-solid fa-user-astronaut text-2xl text-sky-400"></i>
+                        <span class="font-bold text-sky-200 text-sm">Karla</span>
+                    </button>
+                    <button onclick="selectRole('oscar')" id="btnOscar" class="p-4 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-center transition-all flex flex-col items-center gap-2">
+                        <i class="fa-solid fa-robot text-2xl text-indigo-400"></i>
+                        <span class="font-bold text-indigo-200 text-sm">Oscar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SELECTOR DE SKIN -->
+            <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 text-left space-y-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Elige tu Skin</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="selectSkin('skin1')" id="btnSkin1" class="p-3 rounded-xl border border-sky-500/40 bg-sky-500/20 text-center transition-all flex items-center justify-center gap-2 font-semibold text-sky-200 text-xs">
+                        <i class="fa-solid fa-shirt"></i> Estilo 1 (Clásico)
+                    </button>
+                    <button onclick="selectSkin('skin2')" id="btnSkin2" class="p-3 rounded-xl border border-slate-700 bg-slate-900 text-center transition-all flex items-center justify-center gap-2 font-semibold text-slate-300 text-xs">
+                        <i class="fa-solid fa-shirt"></i> Estilo 2 (Alternativo)
+                    </button>
+                </div>
+            </div>
+
+            <!-- INSTRUCCIONES DINÁMICAS -->
+            <div id="instructionsBox" class="bg-slate-950/70 border border-slate-800 rounded-2xl p-3 text-left space-y-1 text-xs text-slate-400">
+            </div>
+
+            <button id="btnStartGame" onclick="joinGame()" disabled class="w-full py-4 rounded-2xl font-game font-bold text-slate-950 text-base uppercase tracking-wider bg-gradient-to-r from-sky-400 via-indigo-400 to-amber-300 opacity-50 cursor-not-allowed shadow-lg transition-all flex items-center justify-center gap-2">
+                <span>Comenzar Juego</span>
+                <i class="fa-solid fa-play"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- UI SUPERIOR -->
+    <div class="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none z-20">
+        <div class="bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-sky-500/30 shadow-lg pointer-events-auto flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow">
+                <i class="fa-solid fa-flag-checkered"></i>
+            </div>
+            <div>
+                <h1 class="text-xs sm:text-sm font-game font-bold text-sky-200" id="hudLevelTitle">Nivel 1: El Comienzo</h1>
+                <p class="text-[10px] text-slate-400" id="hudStatus">En línea</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 pointer-events-auto">
+            <button id="btnAudio" onclick="toggleAudio()" class="bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md p-3 rounded-2xl border border-sky-500/30 text-sky-300 shadow-lg flex items-center justify-center w-11 h-11">
+                <i id="audioIcon" class="fa-solid fa-volume-xmark text-slate-400"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIÓN / ESTADO EN VIVO EN PANTALLA -->
+    <div id="statusBanner" class="absolute top-20 left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-300 opacity-100 z-20">
+        <div id="statusBannerContent" class="bg-slate-900/90 backdrop-blur-md border border-sky-400/40 text-sky-200 px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-2 text-xs font-medium">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+            <span id="statusBannerText">Esperando a que la otra persona se conecte a la sala... (puedes jugar mientras)</span>
+        </div>
+    </div>
+
+    <!-- CONTROLES TÁCTILES EN PANTALLA (SOLO PARA CELULAR) -->
+    <div id="touchControls" class="absolute bottom-16 left-4 right-4 flex justify-between items-center pointer-events-none z-30 hidden">
+        <div class="flex gap-2 pointer-events-auto">
+            <button ontouchstart="pressKey('left')" ontouchend="releaseKey('left')" onmousedown="pressKey('left')" onmouseup="releaseKey('left')" class="w-16 h-16 rounded-2xl bg-slate-900/80 border border-sky-500/40 text-sky-300 flex items-center justify-center text-xl active:bg-sky-500/30 shadow-lg">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <button ontouchstart="pressKey('right')" ontouchend="releaseKey('right')" onmousedown="pressKey('right')" onmouseup="releaseKey('right')" class="w-16 h-16 rounded-2xl bg-slate-900/80 border border-sky-500/40 text-sky-300 flex items-center justify-center text-xl active:bg-sky-500/30 shadow-lg">
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+        <div class="flex gap-2 pointer-events-auto">
+            <button ontouchstart="pressKey('crouch')" ontouchend="releaseKey('crouch')" onmousedown="pressKey('crouch')" onmouseup="releaseKey('crouch')" class="w-16 h-16 rounded-2xl bg-slate-900/80 border border-indigo-500/40 text-indigo-300 flex items-center justify-center text-xl active:bg-indigo-500/30 shadow-lg">
+                <i class="fa-solid fa-arrow-down"></i>
+            </button>
+            <button ontouchstart="pressKey('jump')" ontouchend="releaseKey('jump')" onmousedown="pressKey('jump')" onmouseup="releaseKey('jump')" class="w-16 h-16 rounded-2xl bg-sky-500/80 border border-sky-300 text-white flex items-center justify-center text-xl active:bg-sky-400 shadow-lg">
+                <i class="fa-solid fa-arrow-up"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- CHAT FLOTANTE INFERIOR -->
+    <div id="chatBarContainer" class="absolute bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-slate-900/90 backdrop-blur-md border border-sky-500/30 rounded-2xl p-2 shadow-2xl pointer-events-auto z-30 flex items-center gap-2">
+        <input type="text" id="chatInput" placeholder="Escribe un mensaje en vivo..." maxlength="80" onkeydown="handleChatKey(event)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+        <button onclick="sendChatMessage()" class="bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 text-white px-4 py-2 rounded-xl text-xs font-bold shadow transition-all">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+
+    <!-- MODAL MOTIVACIONAL AL COMPLETAR NIVEL -->
+    <div id="levelModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-lg z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500">
+        <div class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-sky-500/40 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative text-center space-y-5">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-slate-950 text-3xl font-bold flex items-center justify-center mx-auto shadow-lg">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h2 id="modalTitle" class="text-2xl font-game font-bold text-sky-300">¡Nivel Completado!</h2>
+            
+            <div class="bg-slate-950/80 border border-sky-500/20 rounded-2xl p-5 text-slate-200 text-sm leading-relaxed text-left shadow-inner font-medium" id="modalMessage">
+            </div>
+
+            <button id="modalActionBtn" onclick="nextLevel()" class="w-full py-3.5 rounded-xl font-game font-bold text-slate-950 bg-gradient-to-r from-sky-400 via-indigo-300 to-amber-300 shadow-lg hover:brightness-110 transition-all">
+                Siguiente Nivel
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const socket = typeof io !== 'undefined' ? io() : { on: () => {}, emit: () => {} };
+        let selectedRole = null;
+        let selectedSkin = 'skin1';
+        let currentLevel = 1;
+        let userDevice = 'pc';
+
+        function setDevice(device) {
+            userDevice = device;
+            document.getElementById('deviceScreen').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('startScreen').classList.remove('opacity-0', 'pointer-events-none');
+
+            const instBox = document.getElementById('instructionsBox');
+            if (device === 'mobile') {
+                document.getElementById('touchControls').classList.remove('hidden');
+                instBox.innerHTML = `
+                    <p class="font-semibold text-sky-300"><i class="fa-solid fa-mobile-screen mr-1"></i> Controles Táctiles (Celular):</p>
+                    <p>• Usa los botones en pantalla para moverte <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">←</kbd> <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">→</kbd></p>
+                    <p>• Salta con <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">↑</kbd> y agáchate con <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">↓</kbd></p>
+                `;
+            } else {
+                instBox.innerHTML = `
+                    <p class="font-semibold text-sky-300"><i class="fa-solid fa-keyboard mr-1"></i> Controles de Computadora (PC):</p>
+                    <p>• Moverse: <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">A</kbd> / <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">D</kbd> o Flechas Izq/Der</p>
+                    <p>• Saltar: <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">W</kbd>, <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">Espacio</kbd> o Flecha Arriba</p>
+                    <p>• Agacharse: <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">S</kbd> o Flecha Abajo</p>
+                `;
+            }
+        }
+
+        const levelMessages = {
+            1: {
+                title: "¡Nivel 1 Completado! 🌟",
+                message: "Se te quiere mucho Karla. Recuerda que vales demasiado y que eres única. De verdad, no te dejes tumbar por nada ni por nadie porque vales un montón.",
+                btnText: "Ir al Nivel 2"
+            },
+            2: {
+                title: "¡Nivel 2 Superado! 🤝",
+                message: "Recuerda que tienes todo mi apoyo para lo que necesites, de verdad. En lo que te pueda ayudar o lo que ocupe escuchar, aquí ando contigo cuando ocupes algo.",
+                btnText: "Ir al Nivel Final"
+            },
+            3: {
+                title: "¡Juego Completado! 🎉",
+                message: "Sé que no han sido días fáciles, pero recuerda que tienes a mucha gente que te quiere y te apoya de verdad. Échale muchas ganas, tómate las cosas con calma y acuérdate siempre de lo mucho que vales.",
+                btnText: "Volver a Jugar"
+            }
+        };
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.getElementById('btnKarla').style.borderColor = role === 'karla' ? '#38bdf8' : 'rgba(56,189,248,0.2)';
+            document.getElementById('btnOscar').style.borderColor = role === 'oscar' ? '#818cf8' : 'rgba(129,140,248,0.2)';
+            checkStartReady();
+        }
+
+        function selectSkin(skin) {
+            selectedSkin = skin;
+            document.getElementById('btnSkin1').className = skin === 'skin1' ? 'p-3 rounded-xl border border-sky-500/40 bg-sky-500/20 text-center transition-all flex items-center justify-center gap-2 font-semibold text-sky-200 text-xs' : 'p-3 rounded-xl border border-slate-700 bg-slate-900 text-center transition-all flex items-center justify-center gap-2 font-semibold text-slate-300 text-xs';
+            document.getElementById('btnSkin2').className = skin === 'skin2' ? 'p-3 rounded-xl border border-indigo-500/40 bg-indigo-500/20 text-center transition-all flex items-center justify-center gap-2 font-semibold text-indigo-200 text-xs' : 'p-3 rounded-xl border border-slate-700 bg-slate-900 text-center transition-all flex items-center justify-center gap-2 font-semibold text-slate-300 text-xs';
+            checkStartReady();
+        }
+
+        function checkStartReady() {
+            if (selectedRole) {
+                const btn = document.getElementById('btnStartGame');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed', 'glow-btn');
+                btn.classList.add('glow-btn');
+            }
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startCanvas = document.getElementById('startParticleCanvas');
+        const startCtx = startCanvas ? startCanvas.getContext('2d') : null;
+
+        let width, height, gameStarted = false;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            if (startCanvas) { startCanvas.width = width; startCanvas.height = height; }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let players = {};
+        let myId = null;
+
+        const player = {
+            x: 100,
+            y: 0,
+            vx: 0,
+            vy: 0,
+            speed: 5.5,
+            jumpPower: -13,
+            gravity: 0.65,
+            isGrounded: false,
+            isCrouched: false,
+            direction: 1,
+            isWalking: false,
+            width: 32,
+            height: 64,
+            chatMessage: "",
+            chatTimer: 0
+        };
+
+        const levels = {
+            1: {
+                title: "Nivel 1: El Comienzo",
+                worldWidth: 2600,
+                platforms: [
+                    { x: 0, y: 120, w: 500, h: 120 },
+                    { x: 580, y: 160, w: 200, h: 40 },
+                    { x: 860, y: 210, w: 180, h: 40 },
+                    { x: 1120, y: 150, w: 250, h: 40 },
+                    { x: 1450, y: 190, w: 200, h: 40 },
+                    { x: 1720, y: 130, w: 220, h: 40 },
+                    { x: 2020, y: 120, w: 500, h: 120 }
+                ],
+                goal: { x: 2350, y: 120, w: 50, h: 80 }
+            },
+            2: {
+                title: "Nivel 2: Desafío Elevado",
+                worldWidth: 2800,
+                platforms: [
+                    { x: 0, y: 120, w: 400, h: 120 },
+                    { x: 480, y: 190, w: 140, h: 30 },
+                    { x: 690, y: 260, w: 140, h: 30 },
+                    { x: 910, y: 320, w: 160, h: 30 },
+                    { x: 1150, y: 240, w: 130, h: 30 },
+                    { x: 1360, y: 180, w: 140, h: 30 },
+                    { x: 1580, y: 270, w: 150, h: 30 },
+                    { x: 1810, y: 340, w: 160, h: 30 },
+                    { x: 2050, y: 250, w: 150, h: 30 },
+                    { x: 2280, y: 140, w: 500, h: 140 }
+                ],
+                goal: { x: 2600, y: 140, w: 50, h: 80 }
+            },
+            3: {
+                title: "Nivel 3: La Gran Cima",
+                worldWidth: 3200,
+                platforms: [
+                    { x: 0, y: 120, w: 350, h: 120 },
+                    { x: 430, y: 180, w: 110, h: 30 },
+                    { x: 610, y: 250, w: 100, h: 30 },
+                    { x: 780, y: 330, w: 110, h: 30 },
+                    { x: 970, y: 400, w: 120, h: 30 },
+                    { x: 1170, y: 320, w: 100, h: 30 },
+                    { x: 1350, y: 230, w: 110, h: 30 },
+                    { x: 1540, y: 310, w: 100, h: 30 },
+                    { x: 1720, y: 390, w: 110, h: 30 },
+                    { x: 1910, y: 470, w: 120, h: 30 },
+                    { x: 2120, y: 380, w: 100, h: 30 },
+                    { x: 2300, y: 280, w: 110, h: 30 },
+                    { x: 2490, y: 180, w: 120, h: 30 },
+                    { x: 2700, y: 150, w: 500, h: 150 }
+                ],
+                goal: { x: 3000, y: 150, w: 50, h: 80 }
+            }
+        };
+
+        const camera = { x: 0, smoothness: 0.08 };
+        const keys = { left: false, right: false, jump: false, crouch: false };
+
+        function pressKey(action) {
+            if (action === 'left') keys.left = true;
+            if (action === 'right') keys.right = true;
+            if (action === 'jump') {
+                if (player.isGrounded && !player.isCrouched) {
+                    player.vy = player.jumpPower;
+                    player.isGrounded = false;
+                }
+            }
+            if (action === 'crouch') {
+                keys.crouch = true;
+                player.isCrouched = true;
+            }
+        }
+
+        function releaseKey(action) {
+            if (action === 'left') keys.left = false;
+            if (action === 'right') keys.right = false;
+            if (action === 'crouch') {
+                keys.crouch = false;
+                player.isCrouched = false;
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (!gameStarted) return;
+            if (document.activeElement.id === 'chatInput') return;
+
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = true;
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = true;
+            if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w' || e.key === ' ') {
+                if (player.isGrounded && !player.isCrouched) {
+                    player.vy = player.jumpPower;
+                    player.isGrounded = false;
+                }
+            }
+            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
+                keys.crouch = true;
+                player.isCrouched = true;
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = false;
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = false;
+            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
+                keys.crouch = false;
+                player.isCrouched = false;
+            }
+        });
+
+        function joinGame() {
+            if (!selectedRole) return;
+            gameStarted = true;
+            myId = socket.id;
+            document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
+
+            socket.emit('joinGame', { 
+                name: selectedRole === 'karla' ? 'Karla' : 'Oscar', 
+                role: selectedRole, 
+                skin: selectedSkin 
+            });
+
+            initAudio();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            isAudioPlaying = true;
+            document.getElementById('audioIcon').className = 'fa-solid fa-volume-high text-sky-400 animate-pulse';
+            startMelody();
+
+            gameLoop();
+        }
+
+        socket.on('currentPlayers', (serverPlayers) => {
+            players = serverPlayers;
+            if (!myId) myId = socket.id;
+            updateStatusBanner();
+        });
+
+        socket.on('playerMoved', (pData) => { 
+            if (players[pData.id]) {
+                players[pData.id] = pData; 
+            }
+        });
+
+        socket.on('removePlayer', (id) => { 
+            delete players[id]; 
+            updateStatusBanner(); 
+        });
+
+        socket.on('playerChat', (data) => {
+            if (players[data.id]) {
+                players[data.id].chatMessage = data.message;
+                players[data.id].chatTimer = 300;
+            }
+        });
+
+        function updateStatusBanner() {
+            const count = Object.keys(players).length;
+            const textEl = document.getElementById('statusBannerText');
+            const hudStatus = document.getElementById('hudStatus');
+
+            if (count >= 2) {
+                textEl.innerText = "¡Ambos conectados! Jugando juntos en tiempo real ✨";
+                hudStatus.innerText = "Multijugador (2/2)";
+                hudStatus.className = "text-[10px] text-emerald-400 font-bold";
+            } else {
+                const other = selectedRole === 'karla' ? 'Oscar' : 'Karla';
+                textEl.innerText = `Esperando a que ${other} se conecte a la sala... (puedes jugar mientras)`;
+                hudStatus.innerText = "Modo Individual (1/2)";
+                hudStatus.className = "text-[10px] text-amber-400";
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            player.chatMessage = msg;
+            player.chatTimer = 300;
+            if (myId && players[myId]) {
+                players[myId].chatMessage = msg;
+                players[myId].chatTimer = 300;
+            }
+            socket.emit('chatMessage', msg);
+            input.value = "";
+        }
+
+        function handleChatKey(e) { if (e.key === 'Enter') sendChatMessage(); }
+
+        const stars = Array.from({ length: 30 }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            size: Math.random() * 3 + 1,
+            speedY: Math.random() * 0.3 + 0.1,
+            opacity: Math.random() * 0.6 + 0.2
+        }));
+
+        function drawStars(context) {
+            context.save();
+            stars.forEach(s => {
+                s.y -= s.speedY;
+                if (s.y < -10) { s.y = height + 10; s.x = Math.random() * width; }
+                context.fillStyle = `rgba(56, 189, 248, ${s.opacity})`;
+                context.beginPath(); context.arc(s.x, s.y, s.size, 0, Math.PI * 2); context.fill();
+            });
+            context.restore();
+        }
+
+        function startParticleLoop() {
+            if (!gameStarted && startCtx) {
+                startCtx.clearRect(0, 0, width, height);
+                drawStars(startCtx);
+                requestAnimationFrame(startParticleLoop);
+            }
+        }
+        startParticleLoop();
+
+        function update() {
+            if (!gameStarted) return;
+
+            player.vx = 0;
+            if (!player.isCrouched) {
+                if (keys.left) { player.vx = -player.speed; player.direction = -1; player.isWalking = true; }
+                else if (keys.right) { player.vx = player.speed; player.direction = 1; player.isWalking = true; }
+                else { player.isWalking = false; }
+            } else {
+                player.isWalking = false;
+            }
+
+            player.x += player.vx;
+            player.vy += player.gravity;
+            player.y += player.vy;
+
+            const lvl = levels[currentLevel];
+            player.isGrounded = false;
+
+            const activeHeight = player.isCrouched ? 40 : player.height;
+
+            lvl.platforms.forEach(plat => {
+                const platY = height - plat.y;
+                if (
+                    player.x + player.width / 2 > plat.x &&
+                    player.x - player.width / 2 < plat.x + plat.w &&
+                    player.y + activeHeight >= platY &&
+                    player.y + activeHeight - player.vy <= platY + 15 &&
+                    player.vy >= 0
+                ) {
+                    player.y = platY - activeHeight;
+                    player.vy = 0;
+                    player.isGrounded = true;
+                }
+            });
+
+            if (player.y > height + 100) {
+                player.x = 100;
+                player.y = 0;
+                player.vy = 0;
+            }
+
+            if (player.x < 50) player.x = 50;
+            if (player.x > lvl.worldWidth - 50) player.x = lvl.worldWidth - 50;
+
+            if (player.chatTimer > 0) player.chatTimer--;
+
+            if (myId && players[myId]) {
+                players[myId].x = player.x;
+                players[myId].y = player.y;
+                players[myId].direction = player.direction;
+                players[myId].isWalking = player.isWalking;
+                players[myId].isCrouched = player.isCrouched;
+                players[myId].chatMessage = player.chatMessage;
+                players[myId].chatTimer = player.chatTimer;
+
+                socket.emit('playerMovement', {
+                    x: player.x,
+                    y: player.y,
+                    direction: player.direction,
+                    isWalking: player.isWalking,
+                    isCrouched: player.isCrouched
+                });
+            }
+
+            camera.x += ((player.x - width / 3) - camera.x) * camera.smoothness;
+            if (camera.x < 0) camera.x = 0;
+            if (camera.x > lvl.worldWidth - width) camera.x = lvl.worldWidth - width;
+
+            const goal = lvl.goal;
+            const goalY = height - goal.y - goal.h;
+            if (
+                Math.abs(player.x - (goal.x + goal.w / 2)) < 40 &&
+                Math.abs((player.y + activeHeight / 2) - (goalY + goal.h / 2)) < 60
+            ) {
+                triggerLevelComplete();
+            }
+        }
+
+        function triggerLevelComplete() {
+            if (document.getElementById('levelModal').classList.contains('opacity-100')) return;
+
+            const info = levelMessages[currentLevel];
+            document.getElementById('modalTitle').innerText = info.title;
+            document.getElementById('modalMessage').innerText = info.message;
+            document.getElementById('modalActionBtn').innerText = info.btnText;
+
+            document.getElementById('levelModal').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('levelModal').classList.add('opacity-100');
+        }
+
+        function nextLevel() {
+            document.getElementById('levelModal').classList.remove('opacity-100');
+            document.getElementById('levelModal').classList.add('opacity-0', 'pointer-events-none');
+
+            if (currentLevel < 3) {
+                currentLevel++;
+            } else {
+                currentLevel = 1;
+            }
+
+            player.x = 100;
+            player.y = 0;
+            player.vy = 0;
+            document.getElementById('hudLevelTitle').innerText = levels[currentLevel].title;
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, width, height);
+
+            const lvl = levels[currentLevel];
+
+            const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+            bgGrad.addColorStop(0, '#0f172a');
+            bgGrad.addColorStop(1, '#020617');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.save();
+            ctx.translate(-camera.x, 0);
+
+            lvl.platforms.forEach(plat => {
+                const platY = height - plat.y;
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                ctx.fillRect(plat.x + 4, platY + 4, plat.w, plat.h);
+
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(plat.x, platY, plat.w, plat.h);
+
+                ctx.fillStyle = '#38bdf8';
+                ctx.fillRect(plat.x, platY, plat.w, 4);
+            });
+
+            const goal = lvl.goal;
+            const goalY = height - goal.y - goal.h;
+            
+            const portalGrad = ctx.createRadialGradient(
+                goal.x + goal.w / 2, goalY + goal.h / 2, 5,
+                goal.x + goal.w / 2, goalY + goal.h / 2, 45
+            );
+            portalGrad.addColorStop(0, '#fbbf24');
+            portalGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+            ctx.fillStyle = portalGrad;
+            ctx.beginPath();
+            ctx.arc(goal.x + goal.w / 2, goalY + goal.h / 2, 45, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(goal.x, goalY, goal.w, goal.h);
+            ctx.fillStyle = '#fef08a';
+            ctx.font = 'bold 20px Fredoka, cursive';
+            ctx.textAlign = 'center';
+            ctx.fillText('META', goal.x + goal.w / 2, goalY + goal.h / 2 + 7);
+
+            Object.values(players).forEach(p => {
+                ctx.save();
+                const curH = p.isCrouched ? 40 : 64;
+                ctx.translate(p.x, p.y + curH);
+
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                ctx.beginPath(); ctx.ellipse(0, 0, 14, 4, 0, 0, Math.PI * 2); ctx.fill();
+
+                if (p.direction === -1) ctx.scale(-1, 1);
+
+                const skin = p.skin || 'skin1';
+
+                if (skin === 'skin2') {
+                    ctx.fillStyle = '#ec4899';
+                    ctx.beginPath();
+                    ctx.roundRect(-12, -curH + 18, 24, curH - 20, 6);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#fed7aa';
+                    ctx.beginPath();
+                    ctx.arc(0, -curH + 12, 12, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.beginPath();
+                    ctx.arc(0, -curH + 9, 13, Math.PI, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillStyle = p.role === 'karla' ? '#0284c7' : '#4f46e5';
+                    ctx.beginPath();
+                    ctx.roundRect(-12, -curH + 18, 24, curH - 20, 6);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#fed7aa';
+                    ctx.beginPath();
+                    ctx.arc(0, -curH + 12, 12, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = p.role === 'karla' ? '#7c2d12' : '#1e1b4b';
+                    ctx.beginPath();
+                    ctx.arc(0, -curH + 9, 13, Math.PI, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.arc(4, -curH + 11, 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.fillStyle = '#e2e8f0';
+                ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(p.name, 0, -10);
+
+                if (p.chatMessage && p.chatTimer > 0) {
+                    ctx.font = '12px Plus Jakarta Sans, sans-serif';
+                    const tw = ctx.measureText(p.chatMessage).width;
+                    const bw = tw + 16;
+                    const bh = 24;
+
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.roundRect(-bw / 2, -35 - bh, bw, bh, 6);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.fillText(p.chatMessage, 0, -35 - 8);
+                }
+
+                ctx.restore();
+            });
+
+            ctx.restore();
+            drawStars(ctx);
+        }
+
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        let audioCtx, isAudioPlaying = false, melodyInterval;
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        const notes = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88];
+        function playNote(freq) {
+            if (!audioCtx || !isAudioPlaying) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 1.2);
+        }
+        function startMelody() {
+            let idx = 0;
+            melodyInterval = setInterval(() => { if (isAudioPlaying) { playNote(notes[idx]); idx = (idx+1)%notes.length; } }, 600);
+        }
+        function toggleAudio() {
+            initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
+            isAudioPlaying = !isAudioPlaying;
+            document.getElementById('audioIcon').className = isAudioPlaying ? 'fa-solid fa-volume-high text-sky-400 animate-pulse' : 'fa-solid fa-volume-xmark text-slate-400';
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Aventura Estelar | Karla & Oscar</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
