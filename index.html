@@ -57,7 +57,7 @@
     <!-- CANVAS DEL JUEGO -->
     <canvas id="gameCanvas"></canvas>
 
-    <!-- PANTALLA DE INICIO: SELECCIÓN DE PERSONAJE (¿Quién eres?) -->
+    <!-- PANTALLA DE INICIO: SELECCIÓN DE PERSONAJE -->
     <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl transition-all duration-700">
         <canvas id="startParticleCanvas" class="absolute inset-0 pointer-events-none"></canvas>
 
@@ -105,7 +105,7 @@
 
             <!-- INSTRUCCIONES DE CONTROLES -->
             <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-3 text-left space-y-1 text-xs text-slate-400">
-                <p class="font-semibold text-sky-300"><i class="fa-solid fa-keyboard mr-1"></i> Controles de Computadora / Celular:</p>
+                <p class="font-semibold text-sky-300"><i class="fa-solid fa-keyboard mr-1"></i> Controles:</p>
                 <p>• Moverse: <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">A</kbd> / <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">D</kbd> (o Flechas Izq/Der)</p>
                 <p>• Saltar: <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">W</kbd> o <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">Espacio</kbd></p>
                 <p>• Agacharse: <kbd class="bg-slate-800 px-1 py-0.5 rounded text-sky-300">S</kbd></p>
@@ -153,7 +153,7 @@
         </button>
     </div>
 
-    <!-- MODAL MOTIVACIONAL CON TUS MENSAJES EXACTOS -->
+    <!-- MODAL MOTIVACIONAL CON MENSAJES EXACTOS -->
     <div id="levelModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-lg z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500">
         <div class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-sky-500/40 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative text-center space-y-5">
             <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-slate-950 text-3xl font-bold flex items-center justify-center mx-auto shadow-lg">
@@ -221,7 +221,7 @@
 
         const player = {
             x: 100,
-            y: 0,
+            y: 100,
             vx: 0,
             vy: 0,
             speed: 5.5,
@@ -237,26 +237,29 @@
             chatTimer: 0
         };
 
+        // Coordenadas fijas desde el suelo (groundY fijo para evitar diferencias entre celular y lap)
+        const GROUND_Y = 120;
+
         const levels = {
             1: {
                 title: "Nivel 1: El Comienzo",
                 worldWidth: 2600,
                 platforms: [
-                    { x: 0, y: 120, w: 500, h: 120 },
-                    { x: 580, y: 160, w: 200, h: 40 },
-                    { x: 860, y: 210, w: 180, h: 40 },
-                    { x: 1120, y: 150, w: 250, h: 40 },
-                    { x: 1450, y: 190, w: 200, h: 40 },
-                    { x: 1720, y: 130, w: 220, h: 40 },
-                    { x: 2020, y: 120, w: 500, h: 120 }
+                    { x: 0, y: GROUND_Y, w: 500, h: 120 },
+                    { x: 580, y: 180, w: 200, h: 40 },
+                    { x: 860, y: 240, w: 180, h: 40 },
+                    { x: 1120, y: 180, w: 250, h: 40 },
+                    { x: 1450, y: 220, w: 200, h: 40 },
+                    { x: 1720, y: 160, w: 220, h: 40 },
+                    { x: 2020, y: GROUND_Y, w: 500, h: 120 }
                 ],
-                goal: { x: 2350, y: 120, w: 50, h: 80 }
+                goal: { x: 2350, y: GROUND_Y, w: 50, h: 80 }
             },
             2: {
                 title: "Nivel 2: Desafío Elevado",
                 worldWidth: 2800,
                 platforms: [
-                    { x: 0, y: 120, w: 400, h: 120 },
+                    { x: 0, y: GROUND_Y, w: 400, h: 120 },
                     { x: 480, y: 190, w: 140, h: 30 },
                     { x: 690, y: 260, w: 140, h: 30 },
                     { x: 910, y: 320, w: 160, h: 30 },
@@ -265,15 +268,15 @@
                     { x: 1580, y: 270, w: 150, h: 30 },
                     { x: 1810, y: 340, w: 160, h: 30 },
                     { x: 2050, y: 250, w: 150, h: 30 },
-                    { x: 2280, y: 140, w: 500, h: 140 }
+                    { x: 2280, y: GROUND_Y, w: 500, h: 140 }
                 ],
-                goal: { x: 2600, y: 140, w: 50, h: 80 }
+                goal: { x: 2600, y: GROUND_Y, w: 50, h: 80 }
             },
             3: {
                 title: "Nivel 3: La Gran Cima",
                 worldWidth: 3200,
                 platforms: [
-                    { x: 0, y: 120, w: 350, h: 120 },
+                    { x: 0, y: GROUND_Y, w: 350, h: 120 },
                     { x: 430, y: 180, w: 110, h: 30 },
                     { x: 610, y: 250, w: 100, h: 30 },
                     { x: 780, y: 330, w: 110, h: 30 },
@@ -286,9 +289,9 @@
                     { x: 2120, y: 380, w: 100, h: 30 },
                     { x: 2300, y: 280, w: 110, h: 30 },
                     { x: 2490, y: 180, w: 120, h: 30 },
-                    { x: 2700, y: 150, w: 500, h: 150 }
+                    { x: 2700, y: GROUND_Y, w: 500, h: 150 }
                 ],
-                goal: { x: 3000, y: 150, w: 50, h: 80 }
+                goal: { x: 3000, y: GROUND_Y, w: 50, h: 80 }
             }
         };
 
@@ -346,9 +349,8 @@
             myId = socket.id;
             document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
 
-            // Posición inicial segura sobre la primera plataforma
             player.x = 100;
-            player.y = height - 240;
+            player.y = 100;
             player.vy = 0;
 
             socket.emit('joinGame', { 
@@ -470,20 +472,19 @@
 
             const lvl = levels[currentLevel];
             player.isGrounded = false;
-
             const activeHeight = player.isCrouched ? 40 : player.height;
 
-            // Corrección de colisiones síncronas para evitar caídas al agacharse
+            // Colisiones precisas usando la coordenada Y desde abajo hacia arriba
             lvl.platforms.forEach(plat => {
-                const platY = height - plat.y;
+                const platTopY = height - plat.y - plat.h;
                 if (
                     player.x + player.width / 2 > plat.x &&
                     player.x - player.width / 2 < plat.x + plat.w &&
-                    player.y + activeHeight >= platY &&
-                    player.y + activeHeight - player.vy <= platY + 18 &&
+                    player.y + activeHeight >= platTopY &&
+                    player.y + activeHeight - player.vy <= platTopY + 15 &&
                     player.vy >= 0
                 ) {
-                    player.y = platY - activeHeight;
+                    player.y = platTopY - activeHeight;
                     player.vy = 0;
                     player.isGrounded = true;
                 }
@@ -491,7 +492,7 @@
 
             if (player.y > height + 100) {
                 player.x = 100;
-                player.y = height - 240;
+                player.y = 100;
                 player.vy = 0;
             }
 
@@ -523,10 +524,10 @@
             if (camera.x > lvl.worldWidth - width) camera.x = lvl.worldWidth - width;
 
             const goal = lvl.goal;
-            const goalY = height - goal.y - goal.h;
+            const goalTopY = height - goal.y - goal.h;
             if (
                 Math.abs(player.x - (goal.x + goal.w / 2)) < 40 &&
-                Math.abs((player.y + activeHeight / 2) - (goalY + goal.h / 2)) < 60
+                Math.abs((player.y + activeHeight / 2) - (goalTopY + goal.h / 2)) < 60
             ) {
                 triggerLevelComplete();
             }
@@ -555,7 +556,7 @@
             }
 
             player.x = 100;
-            player.y = height - 240;
+            player.y = 100;
             player.vy = 0;
             document.getElementById('hudLevelTitle').innerText = levels[currentLevel].title;
         }
@@ -574,40 +575,43 @@
             ctx.save();
             ctx.translate(-camera.x, 0);
 
+            // Renderizar plataformas
             lvl.platforms.forEach(plat => {
-                const platY = height - plat.y;
+                const platTopY = height - plat.y - plat.h;
                 ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                ctx.fillRect(plat.x + 4, platY + 4, plat.w, plat.h);
+                ctx.fillRect(plat.x + 4, platTopY + 4, plat.w, plat.h);
 
                 ctx.fillStyle = '#1e293b';
-                ctx.fillRect(plat.x, platY, plat.w, plat.h);
+                ctx.fillRect(plat.x, platTopY, plat.w, plat.h);
 
                 ctx.fillStyle = '#38bdf8';
-                ctx.fillRect(plat.x, platY, plat.w, 4);
+                ctx.fillRect(plat.x, platTopY, plat.w, 4);
             });
 
+            // Renderizar meta
             const goal = lvl.goal;
-            const goalY = height - goal.y - goal.h;
+            const goalTopY = height - goal.y - goal.h;
             
             const portalGrad = ctx.createRadialGradient(
-                goal.x + goal.w / 2, goalY + goal.h / 2, 5,
-                goal.x + goal.w / 2, goalY + goal.h / 2, 45
+                goal.x + goal.w / 2, goalTopY + goal.h / 2, 5,
+                goal.x + goal.w / 2, goalTopY + goal.h / 2, 45
             );
             portalGrad.addColorStop(0, '#fbbf24');
             portalGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
             ctx.fillStyle = portalGrad;
             ctx.beginPath();
-            ctx.arc(goal.x + goal.w / 2, goalY + goal.h / 2, 45, 0, Math.PI * 2);
+            ctx.arc(goal.x + goal.w / 2, goalTopY + goal.h / 2, 45, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.strokeStyle = '#fbbf24';
             ctx.lineWidth = 3;
-            ctx.strokeRect(goal.x, goalY, goal.w, goal.h);
+            ctx.strokeRect(goal.x, goalTopY, goal.w, goal.h);
             ctx.fillStyle = '#fef08a';
             ctx.font = 'bold 20px Fredoka, cursive';
             ctx.textAlign = 'center';
-            ctx.fillText('META', goal.x + goal.w / 2, goalY + goal.h / 2 + 7);
+            ctx.fillText('META', goal.x + goal.w / 2, goalTopY + goal.h / 2 + 7);
 
+            // Renderizar jugadores
             Object.values(players).forEach(p => {
                 ctx.save();
                 const curH = p.isCrouched ? 40 : 64;
