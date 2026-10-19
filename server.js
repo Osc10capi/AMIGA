@@ -6,6 +6,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Servir los archivos estáticos (index.html, etc.) desde la carpeta actual
 app.use(express.static(__dirname));
 
 let players = {};
@@ -20,7 +21,7 @@ io.on('connection', (socket) => {
             role: playerData.role,
             skin: playerData.skin || 'skin1',
             x: 100,
-            y: 0,
+            y: 100,
             direction: 1,
             isWalking: false,
             isCrouched: false,
@@ -58,5 +59,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Servidor del museo corriendo en el puerto ${PORT}`);
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
